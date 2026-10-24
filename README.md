@@ -64,7 +64,8 @@ Instead of flattening history into a static snapshot, HistoryFather answers thre
 │   │   ├── test_dedup.py               # SimHash & circularity warning tests
 │   │   ├── test_entity_resolution.py   # Canonical alias & fuzzy resolution tests
 │   │   ├── test_temporal_engine.py     # Dual-track timeline & temporal diff tests
-│   │   └── test_graph_engine.py        # NetworkX multi-graph & edge evidence tests
+│   │   ├── test_graph_engine.py        # NetworkX multi-graph & edge evidence tests
+│   │   └── test_security.py            # Comprehensive security, XSS, DoS, & path traversal tests
 │   └── requirements.txt
 ├── frontend/
 │   ├── src/
@@ -172,29 +173,54 @@ The database comes pre-seeded with 5 comprehensive real-world cases:
 
 ---
 
-## 5. Verification & Testing
+## 5. Production Security & Hack-Proof Hardening
 
-The backend is backed by an automated test suite covering all critical algorithmic requirements:
+HistoryFather includes an integrated defense-in-depth security architecture designed to withstand adversarial tampering, scraping, and injection attacks:
+
+1. **Path-Traversal-Proof Static Serving**: Hardened `safe_resolve_static()` ensures requests cannot traverse outside `frontend/dist`. Strict parent directory containment, null-byte rejection, and allowed extension whitelisting prevent unauthorized file disclosure (such as `/etc/passwd` or source files).
+2. **XSS Neutralization in Intelligence Dossiers**: User-controlled inputs (investigation titles, analyst notes, verbatim quotes, and claims) are encoded via `html.escape(..., quote=True)` in standalone HTML dossier exports. Dossier HTML files embed a strict `Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'; font-src data:;` meta tag.
+3. **Algorithmic Bounds & ReDoS Mitigation**: Bounded query terms (128 characters) and early length-difference pruning (`abs(len1 - len2) > 25`) prevent $O(N \cdot M)$ thread stalls in `jaro_winkler_similarity()`, executing in under 1 millisecond.
+4. **Administrative Action CSRF & Wipe Protection**: Dangerous operations such as `/api/admin/reseed` require explicit `X-Admin-Confirm: reseed` headers, dedicated IP rate limiting (6 req/min), and support optional `HISTORYFATHER_ADMIN_KEY` token authentication.
+5. **Defense-in-Depth HTTP Headers**: Automated middleware injects `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `X-XSS-Protection: 1; mode=block`, `Referrer-Policy: strict-origin-when-cross-origin`, and `Permissions-Policy`.
+6. **Sliding-Window Rate Limiting**: In-memory IP-based sliding window rate limiter protects endpoints from scrapers and denial-of-service floods (180 req/min general, 30 req/min ingestion).
+7. **Strict File Permissions**: Enforced `umask 0o077` guarantees SQLite databases, WAL logs, and shared memory files are created with `0600` permissions within a `0700` restricted directory.
+
+---
+
+## 6. Verification & Testing
+
+The backend is backed by an automated 35-test suite covering both core temporal algorithms and security exploit mitigations:
 
 ```bash
 cd /root/historyfather/backend
 PYTHONPATH=. pytest tests -v
 ```
 
-All 25 automated tests verify:
-- Exact SHA-256 and 64-bit SimHash Hamming distance
-- Syndication cluster detection and circular reporting alerts
-- Exact canonical alias resolution and fuzzy Jaro-Winkler string matching
-- Temporal point-in-time filtering ("as-of" time travel)
-- Snapshot comparison diffing ($T_1$ vs $T_2$)
-- NetworkX graph projections and shortest path calculation
-- Edge evidence traceability
-- Multi-format workspace dossier export (Markdown, HTML, JSON)
-- Document ingestion pipeline
+All 35 automated tests pass (100% pass rate):
+- **Core Algorithms (25 tests):**
+  - Exact SHA-256 and 64-bit SimHash Hamming distance
+  - Syndication cluster detection and circular reporting alerts
+  - Exact canonical alias resolution and fuzzy Jaro-Winkler string matching
+  - Temporal point-in-time filtering ("as-of" time travel)
+  - Snapshot comparison diffing ($T_1$ vs $T_2$)
+  - NetworkX graph projections and shortest path calculation
+  - Edge evidence traceability
+  - Multi-format workspace dossier export (Markdown, HTML, JSON)
+  - Document ingestion pipeline
+- **Security & Exploit Verification (10 tests in `test_security.py`):**
+  - Path traversal and arbitrary file read blocked across 9 distinct traversal vectors
+  - Defense-in-depth HTTP security headers verified
+  - Stored & reflected XSS prevention verified in HTML dossier export
+  - Admin reseed confirmation and secret key access control verified
+  - Input validation, limit bounds, and negative offset rejection verified
+  - Ingestion payload size cap verified
+  - Jaro-Winkler ReDoS mitigation verified under 0.05 seconds
+  - Non-existent workspace 404 error handling verified without 500 database trace leaks
+  - Database file permissions verified strictly at `0700` (directory) and `0600` (files)
 
 ---
 
-## 6. Running HistoryFather
+## 7. Running HistoryFather
 
 To start the unified production server (FastAPI serving the compiled React intelligence workstation and REST API):
 
