@@ -205,6 +205,8 @@ class GraphNode(BaseModel):
     first_seen: Optional[str] = None
     last_seen: Optional[str] = None
     degree: int = 0
+    betweenness: float = 0.0
+    hub_score: float = 0.0
 
 class GraphEdge(BaseModel):
     id: str

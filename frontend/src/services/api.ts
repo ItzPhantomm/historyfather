@@ -117,6 +117,22 @@ export const api = {
     return fetchJson(`/api/workspaces/${encodeURIComponent(id)}`);
   },
 
+  getWorkspaceExportMarkdownUrl(id: string) {
+    return `/api/workspaces/${encodeURIComponent(id)}/export/markdown`;
+  },
+
+  getWorkspaceExportHtmlUrl(id: string) {
+    return `/api/workspaces/${encodeURIComponent(id)}/export/html`;
+  },
+
+  getWorkspaceExportJsonUrl(id: string) {
+    return `/api/workspaces/${encodeURIComponent(id)}/export/json`;
+  },
+
+  getWorkspaceExportStixUrl(id: string) {
+    return `/api/workspaces/${encodeURIComponent(id)}/export/stix`;
+  },
+
   async addWorkspaceItem(workspaceId: string, item: {
     item_type: string;
     item_id: string;

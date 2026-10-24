@@ -455,6 +455,21 @@ def export_dossier_json(
         raise HTTPException(status_code=404, detail="Workspace not found")
     return ws.model_dump()
 
+@app.get("/api/workspaces/{ws_id}/export/stix")
+def export_dossier_stix(
+    ws_id: str = FPath(..., min_length=1, max_length=64),
+    engine: DossierEngine = Depends(get_dossier_engine)
+):
+    try:
+        bundle = engine.export_dossier_stix(ws_id)
+        safe_ws = re.sub(r'[^a-zA-Z0-9_\-]', '', ws_id)
+        return JSONResponse(
+            content=bundle,
+            headers={"Content-Disposition": f'attachment; filename="stix21_dossier_{safe_ws}.json"'}
+        )
+    except ValueError:
+        raise HTTPException(status_code=404, detail="Workspace not found")
+
 # --- Ingestion Pipeline ---
 @app.post("/api/ingest", response_model=IngestDocumentResponse)
 def ingest_document(req: IngestDocumentRequest, pipeline: IngestionPipeline = Depends(get_ingestion_pipeline)):

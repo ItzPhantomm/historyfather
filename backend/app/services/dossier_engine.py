@@ -352,3 +352,122 @@ class DossierEngine:
 </html>
 """
         return html_out
+
+    def export_dossier_stix(self, workspace_id: str) -> Dict[str, Any]:
+        """
+        Export workspace evidence and hypothesis ledger as a compliant STIX 2.1 JSON bundle.
+        """
+        import hashlib
+        import json
+        ws = self.get_workspace(workspace_id)
+        if not ws:
+            raise ValueError(f"Workspace {workspace_id} not found")
+
+        bundle_id = f"bundle--{uuid.uuid4()}"
+        now = utcnow_iso()
+        stix_objects: List[Dict[str, Any]] = []
+
+        # 1. Identity SDO for Analyst
+        analyst_id = f"identity--{uuid.uuid5(uuid.NAMESPACE_DNS, ws.analyst_name or 'analyst')}"
+        stix_objects.append({
+            "type": "identity",
+            "spec_version": "2.1",
+            "id": analyst_id,
+            "created": now,
+            "modified": now,
+            "name": ws.analyst_name or "Intelligence Analyst",
+            "identity_class": "individual"
+        })
+
+        # 2. Map Pinned Items to STIX Objects
+        obj_refs: List[str] = [analyst_id]
+        for it in ws.items:
+            item_type = it.get("item_type")
+            d = it.get("details") or {}
+            item_id = it.get("item_id", "")
+            
+            if item_type == "entity":
+                e_type = d.get("entity_type", "threat_actor")
+                stix_type = "threat-actor"
+                if e_type == "malware":
+                    stix_type = "malware"
+                elif e_type == "campaign":
+                    stix_type = "campaign"
+                elif e_type in ("organization", "person"):
+                    stix_type = "identity"
+                elif e_type == "infrastructure":
+                    stix_type = "infrastructure"
+
+                sdo_id = f"{stix_type}--{uuid.uuid5(uuid.NAMESPACE_DNS, item_id)}"
+                stix_objects.append({
+                    "type": stix_type,
+                    "spec_version": "2.1",
+                    "id": sdo_id,
+                    "created": now,
+                    "modified": now,
+                    "name": d.get("canonical_name", item_id),
+                    "description": d.get("summary", ""),
+                    "confidence": int(float(d.get("confidence_score", 1.0)) * 100),
+                    "created_by_ref": analyst_id
+                })
+                obj_refs.append(sdo_id)
+
+            elif item_type == "claim":
+                note_id = f"note--{uuid.uuid5(uuid.NAMESPACE_DNS, item_id)}"
+                stix_objects.append({
+                    "type": "note",
+                    "spec_version": "2.1",
+                    "id": note_id,
+                    "created": now,
+                    "modified": now,
+                    "abstract": f"Claim ({d.get('status', 'reported')}): {d.get('claim_text', '')[:60]}",
+                    "content": d.get("claim_text", ""),
+                    "authors": [d.get("source_name", "Unknown Source")],
+                    "created_by_ref": analyst_id
+                })
+                obj_refs.append(note_id)
+
+        # 3. Notes SDOs
+        for n in ws.notes:
+            n_id = f"note--{uuid.uuid5(uuid.NAMESPACE_DNS, n.get('id', str(uuid.uuid4())))}"
+            stix_objects.append({
+                "type": "note",
+                "spec_version": "2.1",
+                "id": n_id,
+                "created": n.get("created_at", now),
+                "modified": n.get("updated_at", now),
+                "abstract": n.get("title", "Analyst Note"),
+                "content": n.get("content", ""),
+                "created_by_ref": analyst_id
+            })
+            obj_refs.append(n_id)
+
+        # 4. Report SDO
+        report_id = f"report--{uuid.uuid5(uuid.NAMESPACE_DNS, ws.id)}"
+        stix_objects.append({
+            "type": "report",
+            "spec_version": "2.1",
+            "id": report_id,
+            "created": now,
+            "modified": now,
+            "name": ws.title,
+            "description": ws.description or "HistoryFather Forensics Case",
+            "published": now,
+            "report_types": ["threat-actor", "campaign", "forensic-timeline"],
+            "created_by_ref": analyst_id,
+            "object_refs": obj_refs
+        })
+
+        bundle = {
+            "type": "bundle",
+            "id": bundle_id,
+            "spec_version": "2.1",
+            "objects": stix_objects
+        }
+
+        # Compute SHA-256 cryptographic seal
+        canonical_bytes = json.dumps(bundle, sort_keys=True).encode("utf-8")
+        bundle["x_historyfather_integrity_sha256"] = hashlib.sha256(canonical_bytes).hexdigest()
+        bundle["x_historyfather_workspace_id"] = ws.id
+
+        return bundle

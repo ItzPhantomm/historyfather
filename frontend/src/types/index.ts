@@ -84,6 +84,8 @@ export interface GraphNode {
   first_seen?: string;
   last_seen?: string;
   degree: number;
+  betweenness?: number;
+  hub_score?: number;
   x?: number;
   y?: number;
   vx?: number;

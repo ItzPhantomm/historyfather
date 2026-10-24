@@ -121,11 +121,21 @@ class TemporalGraphEngine:
                 frontier = next_frontier
             active_nodes = subgraph_nodes
 
-        # Step 3: Format output nodes and edges
+        # Step 3: Compute centrality scores
         degrees = dict(G.degree())
+        total_nodes = max(1, len(G.nodes))
+        try:
+            uG = nx.Graph(G)
+            betweenness_scores = nx.betweenness_centrality(uG)
+        except Exception:
+            betweenness_scores = {}
+
         out_nodes: List[GraphNode] = []
         for n in active_nodes:
             ndata = G.nodes[n]
+            deg = degrees.get(n, 0)
+            b_score = round(betweenness_scores.get(n, 0.0), 4)
+            h_score = round(deg / total_nodes, 4)
             out_nodes.append(GraphNode(
                 id=n,
                 label=ndata.get("label", n),
@@ -133,7 +143,9 @@ class TemporalGraphEngine:
                 entity_type=ndata.get("entity_type"),
                 confidence=ndata.get("confidence", 1.0),
                 first_seen=ndata.get("first_seen"),
-                degree=degrees.get(n, 0)
+                degree=deg,
+                betweenness=b_score,
+                hub_score=h_score
             ))
 
         out_edges: List[GraphEdge] = []

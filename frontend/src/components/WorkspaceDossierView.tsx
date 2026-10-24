@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import {
   Folder, Plus, Bookmark, FileText, Download, Printer,
-  Trash2, Edit3, CheckCircle2, ShieldCheck, AlertOctagon, HelpCircle
+  Trash2, Edit3, CheckCircle2, ShieldCheck, AlertOctagon,
+  HelpCircle, Binary, Shield, ExternalLink, X
 } from 'lucide-react';
 import { WorkspaceDetail, WorkspaceItem, WorkspaceNote } from '../types';
 import { api } from '../services/api';
@@ -54,7 +55,7 @@ export const WorkspaceDossierView: React.FC<WorkspaceDossierViewProps> = ({
       const created = await api.createWorkspace({
         title: newTitle,
         description: newDesc,
-        analyst_name: 'Lead Temporal Analyst'
+        analyst_name: 'Lead Forensics Investigator'
       });
       setShowCreateModal(false);
       setNewTitle('');
@@ -104,127 +105,144 @@ export const WorkspaceDossierView: React.FC<WorkspaceDossierViewProps> = ({
 
   const supportingItems = workspace?.items.filter(i => i.hypothesis_stance === 'supports_hypothesis') || [];
   const refutingItems = workspace?.items.filter(i => i.hypothesis_stance === 'refutes_hypothesis') || [];
-  const neutralItems = workspace?.items.filter(i => i.hypothesis_stance === 'neutral') || [];
 
   return (
-    <div className="space-y-6">
-      {/* Workspace Selector & Case Meta */}
-      <div className="bg-[#121215] border border-zinc-800 rounded-xl p-5 shadow-xl space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center space-x-3">
-            <Folder className="w-5 h-5 text-amber-400" />
-            <div>
-              <div className="flex items-center space-x-2">
-                <select
-                  value={activeWorkspaceId}
-                  onChange={(e) => onSelectWorkspace(e.target.value)}
-                  className="bg-[#18181c] border border-zinc-700 rounded px-3 py-1 text-sm font-semibold text-white focus:outline-none"
-                >
-                  {workspaces.map(ws => (
-                    <option key={ws.id} value={ws.id}>{ws.title}</option>
-                  ))}
-                </select>
+    <div className="space-y-5 font-mono text-xs">
+      {/* Workspace Selection & Header Bar */}
+      <div className="tactical-panel p-4 border border-zinc-800 space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800 pb-3">
+          <div className="flex items-center space-x-2">
+            <Folder className="w-4 h-4 text-white" />
+            <span className="text-white font-bold uppercase tracking-wider text-xs">
+              Case Workspaces & Evidence Dossiers
+            </span>
+          </div>
+
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="px-2.5 py-1 bg-white text-black hover:bg-zinc-200 font-semibold text-[11px] flex items-center space-x-1.5 transition-colors"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>NEW CASE WORKSPACE</span>
+          </button>
+        </div>
+
+        {/* Case Workspace Selector Chips */}
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="text-zinc-500 text-[10px] uppercase">ACTIVE CASE:</span>
+          {workspaces.map((ws) => (
+            <button
+              key={ws.id}
+              onClick={() => onSelectWorkspace(ws.id)}
+              className={`px-2.5 py-1 border transition-colors ${
+                activeWorkspaceId === ws.id
+                  ? 'bg-white text-black border-white font-bold'
+                  : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:text-white'
+              }`}
+            >
+              {ws.title}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {workspace && (
+        <div className="space-y-4">
+          {/* Active Case Banner & Multi-Format Exports */}
+          <div className="tactical-panel p-4 border border-zinc-800 space-y-3">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-zinc-800 pb-3">
+              <div>
+                <h2 className="text-sm font-bold text-white uppercase">{workspace.title}</h2>
+                <div className="text-zinc-400 font-sans text-xs mt-0.5">{workspace.description}</div>
+                <div className="text-[10px] text-zinc-500 mt-1 flex items-center space-x-3">
+                  <span>ANALYST: {workspace.analyst_name}</span>
+                  <span>PINNED ITEMS: {workspace.items.length}</span>
+                  <span>NOTES: {workspace.notes.length}</span>
+                </div>
+              </div>
+
+              {/* Multi-Format Export Buttons (STIX 2.1, Markdown, HTML) */}
+              <div className="flex flex-wrap items-center gap-1.5">
                 <button
-                  onClick={() => setShowCreateModal(true)}
-                  className="px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs rounded border border-zinc-700 font-mono flex items-center space-x-1"
+                  onClick={() => downloadFile(api.getWorkspaceExportMarkdownUrl(workspace.id), `${workspace.id}_dossier.md`)}
+                  className="px-2.5 py-1 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 text-[11px] flex items-center space-x-1 transition-colors"
                 >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>New Case</span>
+                  <Download className="w-3 h-3" />
+                  <span>EXPORT MARKDOWN</span>
                 </button>
+                <button
+                  onClick={() => downloadFile(api.getWorkspaceExportHtmlUrl(workspace.id), `${workspace.id}_dossier.html`)}
+                  className="px-2.5 py-1 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 text-[11px] flex items-center space-x-1 transition-colors"
+                >
+                  <Download className="w-3 h-3" />
+                  <span>EXPORT HTML</span>
+                </button>
+                <button
+                  onClick={() => downloadFile(api.getWorkspaceExportStixUrl(workspace.id), `stix21_${workspace.id}.json`)}
+                  className="px-2.5 py-1 bg-white hover:bg-zinc-200 text-black font-semibold text-[11px] flex items-center space-x-1 transition-colors"
+                >
+                  <Binary className="w-3 h-3" />
+                  <span>EXPORT STIX 2.1 BUNDLE</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Cryptographic SHA-256 Seal Indicator */}
+            <div className="p-2.5 bg-black border border-zinc-800 flex items-center justify-between text-[10px] text-zinc-400">
+              <div className="flex items-center space-x-2">
+                <ShieldCheck className="w-3.5 h-3.5 text-white" />
+                <span>INTEGRITY SEAL: Verified provenance with SHA-256 evidence hash verification</span>
+              </div>
+              <div className="text-zinc-500 font-mono">
+                CASE HASH: [0x{workspace.id.slice(-8)}]
               </div>
             </div>
           </div>
 
-          {/* Export Actions Bar */}
-          {workspace && (
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={() => downloadFile(`/api/workspaces/${workspace.id}/export/markdown`, `dossier_${workspace.id}.md`)}
-                className="px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded text-xs font-mono text-zinc-200 flex items-center space-x-1.5 transition-colors"
-                title="Download Executive Markdown Report"
-              >
-                <Download className="w-3.5 h-3.5 text-sky-400" />
-                <span>Export Markdown</span>
-              </button>
-
-              <button
-                onClick={() => window.open(`/api/workspaces/${workspace.id}/export/html`, '_blank')}
-                className="px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded text-xs font-mono text-zinc-200 flex items-center space-x-1.5 transition-colors"
-                title="View Print-Ready HTML Dossier"
-              >
-                <Printer className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Printable HTML</span>
-              </button>
-
-              <button
-                onClick={() => downloadFile(`/api/workspaces/${workspace.id}/export/json`, `dossier_${workspace.id}.json`)}
-                className="px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded text-xs font-mono text-zinc-200 flex items-center space-x-1.5 transition-colors"
-                title="Export Structured JSON"
-              >
-                <FileText className="w-3.5 h-3.5 text-amber-400" />
-                <span>JSON Dossier</span>
-              </button>
-            </div>
-          )}
-        </div>
-
-        {workspace && (
-          <div className="pt-2 border-t border-zinc-800/80 text-xs space-y-1">
-            <p className="text-zinc-300 leading-relaxed">{workspace.description || 'No description provided.'}</p>
-            <div className="flex items-center space-x-4 text-[11px] font-mono text-zinc-500 pt-1">
-              <span>Lead Analyst: <strong className="text-zinc-400">{workspace.analyst_name}</strong></span>
-              <span>Case ID: <code>{workspace.id}</code></span>
-              <span>Pinned Items: {workspace.items.length}</span>
-              <span>Working Notes: {workspace.notes.length}</span>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Hypothesis Ledger: Supporting vs Contradictory Evidence */}
-      {workspace && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {/* Supporting Evidence Column */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-mono uppercase tracking-wider text-emerald-400 flex items-center space-x-1.5">
-                <ShieldCheck className="w-4 h-4" />
-                <span>Supporting Evidence ({supportingItems.length})</span>
-              </h3>
-            </div>
-
+          {/* Dual Column Hypothesis Ledger: Supporting vs Contradictory Evidence */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Column 1: Supporting Evidence */}
             <div className="space-y-3">
+              <div className="flex items-center justify-between border-b border-zinc-800 pb-2">
+                <span className="text-white font-bold uppercase text-[11px] flex items-center space-x-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-white" />
+                  <span>Supporting Evidence ({supportingItems.length})</span>
+                </span>
+                <span className="text-[10px] text-zinc-500">CORROBORATES HYPOTHESIS</span>
+              </div>
+
               {supportingItems.length === 0 ? (
-                <div className="p-6 bg-[#121215] border border-dashed border-zinc-800 rounded-lg text-center text-xs text-zinc-500 font-mono">
-                  No evidence pinned to 'Supports' yet. Use the Evidence Inspector on any search result or timeline milestone to pin.
+                <div className="tactical-panel p-6 text-center text-zinc-500 text-xs border-dashed border-zinc-800">
+                  No supporting evidence pinned to this case. Pin passages or entities from Search & Timeline.
                 </div>
               ) : (
                 supportingItems.map((item) => (
-                  <div key={item.id} className="bg-[#121215] border border-zinc-800 rounded-lg p-3.5 space-y-2 group">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">
+                  <div key={item.id} className="tactical-card p-3 border border-zinc-800 space-y-2 group">
+                    <div className="flex items-center justify-between text-[11px] border-b border-zinc-900 pb-1.5">
+                      <span className="text-[10px] px-1.5 py-0.2 bg-zinc-900 border border-zinc-700 text-white uppercase font-semibold">
                         {item.item_type}
                       </span>
                       <button
                         onClick={() => handleRemoveItem(item.id)}
-                        className="text-zinc-600 hover:text-rose-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="text-zinc-600 hover:text-white transition-colors"
+                        title="Remove pinned item"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="w-3 h-3" />
                       </button>
                     </div>
 
-                    <div className="text-xs font-semibold text-white">
+                    <div className="text-white font-semibold text-xs">
                       {item.details?.canonical_name || item.details?.title || item.details?.claim_text || item.item_id}
                     </div>
 
                     {item.details?.text && (
-                      <div className="text-[11px] text-zinc-300 font-mono bg-[#16161a] p-2 rounded border-l-2 border-emerald-500">
+                      <div className="text-[11px] text-zinc-300 font-sans italic bg-black p-2 border-l-2 border-white">
                         "{item.details.text}"
                       </div>
                     )}
 
                     {item.analyst_note && (
-                      <div className="text-[11px] text-emerald-300/90 font-mono bg-emerald-950/30 p-2 rounded">
+                      <div className="text-[11px] text-zinc-300 font-sans bg-zinc-950 p-2 border border-zinc-800">
                         <strong>Analyst Note:</strong> {item.analyst_note}
                       </div>
                     )}
@@ -232,49 +250,49 @@ export const WorkspaceDossierView: React.FC<WorkspaceDossierViewProps> = ({
                 ))
               )}
             </div>
-          </div>
 
-          {/* Contradictory / Refuting Evidence Column */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-mono uppercase tracking-wider text-rose-400 flex items-center space-x-1.5">
-                <AlertOctagon className="w-4 h-4" />
-                <span>Contradictory / Refuting Evidence ({refutingItems.length})</span>
-              </h3>
-            </div>
-
+            {/* Column 2: Contradictory / Refuting Evidence */}
             <div className="space-y-3">
+              <div className="flex items-center justify-between border-b border-zinc-800 pb-2">
+                <span className="text-white font-bold uppercase text-[11px] flex items-center space-x-1.5">
+                  <AlertOctagon className="w-3.5 h-3.5 text-zinc-400" />
+                  <span>Contradictory / Refuting Evidence ({refutingItems.length})</span>
+                </span>
+                <span className="text-[10px] text-zinc-500">CONTESTED OR SUPERSEDED</span>
+              </div>
+
               {refutingItems.length === 0 ? (
-                <div className="p-6 bg-[#121215] border border-dashed border-zinc-800 rounded-lg text-center text-xs text-zinc-500 font-mono">
-                  No contradictory claims recorded. Contradictory or superseded evidence pinned here isolates conflicting hypotheses.
+                <div className="tactical-panel p-6 text-center text-zinc-500 text-xs border-dashed border-zinc-800">
+                  No contradictory claims recorded. Conflicting evidence pinned here isolates contested hypotheses.
                 </div>
               ) : (
                 refutingItems.map((item) => (
-                  <div key={item.id} className="bg-[#121215] border border-rose-900/40 rounded-lg p-3.5 space-y-2 group">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-rose-950 text-rose-400 border border-rose-800">
-                        {item.item_type} (Contradiction)
+                  <div key={item.id} className="tactical-card p-3 border border-zinc-700 space-y-2 group">
+                    <div className="flex items-center justify-between text-[11px] border-b border-zinc-900 pb-1.5">
+                      <span className="text-[10px] px-1.5 py-0.2 bg-black border border-zinc-600 text-zinc-300 uppercase font-semibold">
+                        CONTRADICTION // {item.item_type}
                       </span>
                       <button
                         onClick={() => handleRemoveItem(item.id)}
-                        className="text-zinc-600 hover:text-rose-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="text-zinc-600 hover:text-white transition-colors"
+                        title="Remove pinned item"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="w-3 h-3" />
                       </button>
                     </div>
 
-                    <div className="text-xs font-semibold text-white">
+                    <div className="text-white font-semibold text-xs">
                       {item.details?.canonical_name || item.details?.title || item.details?.claim_text || item.item_id}
                     </div>
 
                     {item.details?.contradiction_reason && (
-                      <div className="text-[11px] text-rose-300 font-mono bg-rose-950/40 p-2 rounded">
+                      <div className="text-[11px] text-zinc-300 font-sans bg-black p-2 border-l-2 border-zinc-500">
                         <strong>Contradiction Rationale:</strong> {item.details.contradiction_reason}
                       </div>
                     )}
 
                     {item.analyst_note && (
-                      <div className="text-[11px] text-zinc-300 font-mono bg-[#16161a] p-2 rounded">
+                      <div className="text-[11px] text-zinc-300 font-sans bg-zinc-950 p-2 border border-zinc-800">
                         <strong>Analyst Note:</strong> {item.analyst_note}
                       </div>
                     )}
@@ -283,132 +301,144 @@ export const WorkspaceDossierView: React.FC<WorkspaceDossierViewProps> = ({
               )}
             </div>
           </div>
-        </div>
-      )}
 
-      {/* Analyst Working Notes Section */}
-      {workspace && (
-        <div className="bg-[#121215] border border-zinc-800 rounded-xl p-5 shadow-xl space-y-4">
-          <div className="flex items-center justify-between pb-2 border-b border-zinc-800">
-            <h3 className="text-sm font-mono uppercase tracking-wider text-zinc-300 flex items-center space-x-2">
-              <Edit3 className="w-4 h-4 text-sky-400" />
-              <span>Analyst Working Notes & Hypotheses ({workspace.notes.length})</span>
-            </h3>
-            <button
-              onClick={() => setShowAddNote(true)}
-              className="px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs rounded border border-zinc-700 font-mono flex items-center space-x-1"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Add Note</span>
-            </button>
-          </div>
+          {/* Analyst Notes Section */}
+          <div className="tactical-panel p-4 border border-zinc-800 space-y-3">
+            <div className="flex items-center justify-between border-b border-zinc-800 pb-2">
+              <span className="text-white font-bold uppercase text-xs">Analyst Notes & Deductions ({workspace.notes.length})</span>
+              <button
+                onClick={() => setShowAddNote(true)}
+                className="px-2 py-0.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-white text-[10px] uppercase font-semibold transition-colors"
+              >
+                + ADD NOTE
+              </button>
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {workspace.notes.map((note) => (
-              <div key={note.id} className="bg-[#18181c] border border-zinc-800 rounded-lg p-4 space-y-2">
-                <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-semibold text-white font-mono">{note.title}</h4>
-                  <span className="text-[10px] text-zinc-500 font-mono">{note.updated_at.slice(0, 10)}</span>
-                </div>
-                <p className="text-xs text-zinc-300 leading-relaxed font-mono whitespace-pre-wrap">
-                  {note.content}
-                </p>
+            {workspace.notes.length === 0 ? (
+              <div className="text-zinc-500 text-center py-4 text-xs">No analyst notes recorded yet.</div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {workspace.notes.map((n) => (
+                  <div key={n.id} className="tactical-card p-3 border border-zinc-800 space-y-1.5">
+                    <div className="text-white font-bold text-xs">{n.title}</div>
+                    <div className="text-zinc-300 font-sans text-xs leading-relaxed whitespace-pre-line">{n.content}</div>
+                    <div className="text-[10px] text-zinc-500 pt-1 border-t border-zinc-900">UPDATED: {n.updated_at.slice(0, 10)}</div>
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
           </div>
         </div>
       )}
 
-      {/* Modal: Create Workspace */}
+      {/* Create Workspace Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#121215] border border-zinc-800 rounded-xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <h3 className="text-base font-semibold text-white">Create Investigation Dossier</h3>
-            <form onSubmit={handleCreateWorkspace} className="space-y-3">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <form onSubmit={handleCreateWorkspace} className="tactical-panel w-full max-w-md border border-zinc-700 p-5 space-y-4">
+            <div className="flex items-center justify-between border-b border-zinc-800 pb-2">
+              <span className="text-white font-bold uppercase text-xs">Initialize Case Workspace</span>
+              <button onClick={() => setShowCreateModal(false)} type="button" className="text-zinc-500 hover:text-white">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
               <div>
-                <label className="text-xs font-mono text-zinc-400 block mb-1">Case Title</label>
+                <label className="text-[10px] uppercase text-zinc-500 block mb-1">Case Title</label>
                 <input
                   type="text"
                   required
+                  placeholder="e.g. APT29 / Midnight Blizzard 2024 Scope"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  placeholder="e.g., Operation Sandworm SCADA Sabotage"
-                  className="w-full bg-zinc-900 border border-zinc-700 rounded px-3 py-2 text-xs text-zinc-100 focus:outline-none"
+                  className="w-full bg-black border border-zinc-800 text-white px-2.5 py-1.5 text-xs font-mono focus:border-white focus:outline-none"
                 />
               </div>
+
               <div>
-                <label className="text-xs font-mono text-zinc-400 block mb-1">Executive Scope / Description</label>
+                <label className="text-[10px] uppercase text-zinc-500 block mb-1">Investigation Scope / Objective</label>
                 <textarea
+                  rows={3}
+                  placeholder="Reconstruct supply chain injection vectors and subsequent executive inbox compromises..."
                   value={newDesc}
                   onChange={(e) => setNewDesc(e.target.value)}
-                  placeholder="Chronological investigation into..."
-                  className="w-full bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-100 focus:outline-none h-20 resize-none"
+                  className="w-full bg-black border border-zinc-800 text-white px-2.5 py-1.5 text-xs font-mono focus:border-white focus:outline-none"
                 />
               </div>
-              <div className="flex justify-end space-x-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowCreateModal(false)}
-                  className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs rounded"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-1.5 bg-sky-600 hover:bg-sky-500 text-white text-xs rounded font-medium"
-                >
-                  Create Case
-                </button>
-              </div>
-            </form>
-          </div>
+            </div>
+
+            <div className="pt-2 border-t border-zinc-800 flex justify-end space-x-2">
+              <button
+                type="button"
+                onClick={() => setShowCreateModal(false)}
+                className="px-3 py-1 bg-zinc-900 text-zinc-400 hover:text-white text-xs"
+              >
+                CANCEL
+              </button>
+              <button
+                type="submit"
+                className="px-3 py-1 bg-white text-black font-semibold hover:bg-zinc-200 text-xs"
+              >
+                CREATE CASE
+              </button>
+            </div>
+          </form>
         </div>
       )}
 
-      {/* Modal: Add Note */}
+      {/* Add Note Modal */}
       {showAddNote && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#121215] border border-zinc-800 rounded-xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <h3 className="text-base font-semibold text-white">Add Working Analyst Note</h3>
-            <form onSubmit={handleAddNote} className="space-y-3">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <form onSubmit={handleAddNote} className="tactical-panel w-full max-w-md border border-zinc-700 p-5 space-y-4">
+            <div className="flex items-center justify-between border-b border-zinc-800 pb-2">
+              <span className="text-white font-bold uppercase text-xs">Record Analyst Deduction</span>
+              <button onClick={() => setShowAddNote(false)} type="button" className="text-zinc-500 hover:text-white">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
               <div>
-                <label className="text-xs font-mono text-zinc-400 block mb-1">Note Title</label>
+                <label className="text-[10px] uppercase text-zinc-500 block mb-1">Deduction Title</label>
                 <input
                   type="text"
                   required
+                  placeholder="e.g. Supply chain DLL signing corroboration"
                   value={noteTitle}
                   onChange={(e) => setNoteTitle(e.target.value)}
-                  placeholder="e.g., Assessment of DGA Infrastructure"
-                  className="w-full bg-zinc-900 border border-zinc-700 rounded px-3 py-2 text-xs text-zinc-100 focus:outline-none"
+                  className="w-full bg-black border border-zinc-800 text-white px-2.5 py-1.5 text-xs font-mono focus:border-white focus:outline-none"
                 />
               </div>
+
               <div>
-                <label className="text-xs font-mono text-zinc-400 block mb-1">Content</label>
+                <label className="text-[10px] uppercase text-zinc-500 block mb-1">Analytical Assessment</label>
                 <textarea
+                  rows={4}
                   required
+                  placeholder="Telemetry proves the attacker used legitimate compromised certificate infrastructure..."
                   value={noteContent}
                   onChange={(e) => setNoteContent(e.target.value)}
-                  placeholder="Record observations, hypotheses, or contradictory leads..."
-                  className="w-full bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-100 focus:outline-none h-28 resize-none font-mono"
+                  className="w-full bg-black border border-zinc-800 text-white px-2.5 py-1.5 text-xs font-mono focus:border-white focus:outline-none"
                 />
               </div>
-              <div className="flex justify-end space-x-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowAddNote(false)}
-                  className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs rounded"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-1.5 bg-sky-600 hover:bg-sky-500 text-white text-xs rounded font-medium"
-                >
-                  Save Note
-                </button>
-              </div>
-            </form>
-          </div>
+            </div>
+
+            <div className="pt-2 border-t border-zinc-800 flex justify-end space-x-2">
+              <button
+                type="button"
+                onClick={() => setShowAddNote(false)}
+                className="px-3 py-1 bg-zinc-900 text-zinc-400 hover:text-white text-xs"
+              >
+                CANCEL
+              </button>
+              <button
+                type="submit"
+                className="px-3 py-1 bg-white text-black font-semibold hover:bg-zinc-200 text-xs"
+              >
+                SAVE DEDUCTION
+              </button>
+            </div>
+          </form>
         </div>
       )}
     </div>

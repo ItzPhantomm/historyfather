@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   UploadCloud, FileText, CheckCircle2, AlertTriangle,
-  Sparkles, Layers, ShieldCheck, ArrowRight
+  Sparkles, Layers, ShieldCheck, ArrowRight, Terminal, Binary
 } from 'lucide-react';
 import { api } from '../services/api';
 
@@ -48,7 +48,7 @@ export const IngestionHubView: React.FC<IngestionHubViewProps> = ({ onIngestSucc
 
   const handleLoadSample = (sampleType: string) => {
     if (sampleType === 'cisa_advisory') {
-      setTitle('CISA Advisory: Sandworm Team Disrupted via Cyclops Blink Takedown');
+      setTitle('CISA Advisory AA22-054A: Sandworm Team Disrupted via Cyclops Blink Takedown');
       setSourceName('Cybersecurity and Infrastructure Security Agency (CISA)');
       setSourceUrl('https://www.cisa.gov/news-events/cybersecurity-advisories/aa22-054a');
       setSourceType('advisory');
@@ -58,211 +58,198 @@ export const IngestionHubView: React.FC<IngestionHubViewProps> = ({ onIngestSucc
       setContent(
         "The Cybersecurity and Infrastructure Security Agency (CISA), Federal Bureau of Investigation (FBI), " +
         "and United Kingdom's National Cyber Security Centre (NCSC) released a joint Cybersecurity Advisory " +
-        "identifying a modular malware framework dubbed Cyclops Blink used by the Russian state-sponsored actor " +
-        "tracked as Sandworm Team (also known as GRU Unit 74455). " +
-        "Cyclops Blink targets WatchGuard and ASUS network appliances to establish a globally resilient command-and-control mesh."
+        "identifying that the Russian state-sponsored cyber group known as Sandworm Team has been utilizing a new " +
+        "modular malware framework referred to as Cyclops Blink. Cyclops Blink replaces the legacy VPNFilter malware " +
+        "previously deployed by GRU Unit 74455 against network devices globally."
       );
     } else if (sampleType === 'wire_reprint') {
-      setTitle('Global Security Wire: Cyclops Blink Botnet Linked to Russian Military Unit');
-      setSourceName('Global Security Wire');
-      setSourceUrl('https://wire.example.com/cyclops-blink-reprint');
-      setSourceType('news_report');
-      setReliabilityTier('journalism');
-      setPubTime('2022-02-24T04:00:00Z');
+      setTitle('Global Wire Syndicate: Russian Sandworm Hackers Target Routers');
+      setSourceName('Global Wire Syndicate');
+      setSourceUrl('https://globalwiresyndicate.example.com/cyber/sandworm-cyclops');
+      setSourceType('news_article');
+      setReliabilityTier('unverified_media');
+      setPubTime('2022-02-24T08:00:00Z');
+      setObsTime('2022-02-10T00:00:00Z');
       setContent(
-        "A joint Cybersecurity Advisory was released identifying a modular malware framework dubbed Cyclops Blink " +
-        "used by the Russian state-sponsored actor tracked as Sandworm Team (also known as GRU Unit 74455). " +
-        "Cyclops Blink targets WatchGuard and ASUS network appliances to establish a globally resilient command-and-control mesh."
+        "The Cybersecurity and Infrastructure Security Agency (CISA), Federal Bureau of Investigation (FBI), " +
+        "and United Kingdom's National Cyber Security Centre (NCSC) released a joint Cybersecurity Advisory " +
+        "identifying that the Russian state-sponsored cyber group known as Sandworm Team has been utilizing a new " +
+        "modular malware framework referred to as Cyclops Blink. Cyclops Blink replaces the legacy VPNFilter malware " +
+        "previously deployed by GRU Unit 74455 against network devices globally."
       );
     }
   };
 
   return (
-    <div className="space-y-6">
-      {/* Intro Header */}
-      <div className="bg-[#121215] border border-zinc-800 rounded-xl p-5 shadow-xl space-y-3">
-        <div className="flex items-center space-x-2">
-          <UploadCloud className="w-5 h-5 text-sky-400" />
-          <h2 className="text-base font-semibold text-white">Public Intelligence Ingestion & Pipeline Hub</h2>
-        </div>
-        <p className="text-xs text-zinc-400 leading-relaxed">
-          Ingest new public threat reports, historical disclosures, or legal indictments. HistoryFather automatically:
-          <span className="block mt-1 space-y-0.5 font-mono text-zinc-300">
-            &bull; Normalizes 4 timestamps (T_pub, T_event, T_obs, T_ingest)<br/>
-            &bull; Computes 64-bit SimHash and flags near-duplicate / wire syndication risks<br/>
-            &bull; Chunks content into semantic passages and indexes into SQLite FTS5<br/>
-            &bull; Runs deterministic entity resolution to unify aliases into canonical clusters
+    <div className="space-y-5 font-mono text-xs">
+      {/* Header Bar */}
+      <div className="tactical-panel p-4 border border-zinc-800 space-y-3">
+        <div className="flex items-center justify-between border-b border-zinc-800 pb-2.5">
+          <div className="flex items-center space-x-2">
+            <UploadCloud className="w-4 h-4 text-white" />
+            <span className="text-white font-bold uppercase tracking-wider text-xs">
+              Document Ingestion & Automated Fingerprinting Pipeline
+            </span>
+          </div>
+          <span className="text-[10px] text-zinc-500">
+            FTS5 PASSAGE CHUNKER // 64-BIT SIMHASH // CANONICAL ENTITY RESOLVER
           </span>
+        </div>
+
+        <p className="text-zinc-400 font-sans text-xs leading-relaxed">
+          Ingest raw threat reports, advisories, or investigative transcripts. Documents are automatically chunked into forensic passages, indexed for FTS5 full-text search, fingerprinted with 64-bit SimHash, and cross-referenced against canonical entity aliases.
         </p>
 
         {/* Preset Sample Buttons */}
-        <div className="flex items-center space-x-2 pt-2 border-t border-zinc-800 text-xs">
-          <span className="text-zinc-500 font-mono uppercase text-[11px]">Load Sample Report:</span>
+        <div className="flex flex-wrap items-center gap-2 pt-1">
+          <span className="text-zinc-500 text-[10px] uppercase">TEST FIXTURES:</span>
           <button
             type="button"
             onClick={() => handleLoadSample('cisa_advisory')}
-            className="px-2.5 py-1 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded text-zinc-300 font-mono text-[11px]"
+            className="px-2 py-0.5 bg-zinc-950 hover:bg-zinc-900 border border-zinc-800 text-zinc-300 text-[11px] transition-colors"
           >
-            Sample: CISA Sandworm Advisory
+            [1] CISA Official Advisory (Cyclops Blink)
           </button>
           <button
             type="button"
             onClick={() => handleLoadSample('wire_reprint')}
-            className="px-2.5 py-1 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded text-zinc-300 font-mono text-[11px]"
+            className="px-2 py-0.5 bg-zinc-950 hover:bg-zinc-900 border border-zinc-800 text-zinc-300 text-[11px] transition-colors"
           >
-            Sample: Wire Reprint (Test Syndication Warning)
+            [2] Wire Syndicate Reprint (Trigger Circular Warning)
           </button>
         </div>
       </div>
 
-      {/* Ingestion Form */}
-      <form onSubmit={handleSubmit} className="bg-[#121215] border border-zinc-800 rounded-xl p-5 shadow-xl space-y-4">
+      {/* Main Ingest Form */}
+      <form onSubmit={handleSubmit} className="tactical-panel p-4 border border-zinc-800 space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="text-xs font-mono uppercase text-zinc-400 block mb-1">Document Title *</label>
+          <div className="space-y-1">
+            <label className="text-[10px] uppercase text-zinc-500 block">Report / Document Title</label>
             <input
               type="text"
               required
+              placeholder="e.g. Mandiant Threat Intelligence Report: APT29 Infrastructure"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g., CISA Alert AA22-054A: Sandworm Cyclops Blink"
-              className="w-full bg-[#18181c] border border-zinc-700 rounded px-3 py-2 text-xs text-zinc-100 font-mono focus:outline-none focus:border-sky-500"
+              className="w-full bg-black border border-zinc-800 text-white px-2.5 py-1.5 text-xs font-mono focus:border-white focus:outline-none"
             />
           </div>
 
-          <div>
-            <label className="text-xs font-mono uppercase text-zinc-400 block mb-1">Source Organization *</label>
+          <div className="space-y-1">
+            <label className="text-[10px] uppercase text-zinc-500 block">Primary Author / Source Name</label>
             <input
               type="text"
               required
+              placeholder="e.g. Mandiant / FireEye / Microsoft MSTIC"
               value={sourceName}
               onChange={(e) => setSourceName(e.target.value)}
-              placeholder="e.g., CISA / Mandiant / Citizen Lab"
-              className="w-full bg-[#18181c] border border-zinc-700 rounded px-3 py-2 text-xs text-zinc-100 font-mono focus:outline-none focus:border-sky-500"
+              className="w-full bg-black border border-zinc-800 text-white px-2.5 py-1.5 text-xs font-mono focus:border-white focus:outline-none"
             />
           </div>
+        </div>
 
-          <div>
-            <label className="text-xs font-mono uppercase text-zinc-400 block mb-1">Source URL (Optional)</label>
-            <input
-              type="url"
-              value={sourceUrl}
-              onChange={(e) => setSourceUrl(e.target.value)}
-              placeholder="https://..."
-              className="w-full bg-[#18181c] border border-zinc-700 rounded px-3 py-2 text-xs text-zinc-100 font-mono focus:outline-none focus:border-sky-500"
-            />
-          </div>
-
-          <div>
-            <label className="text-xs font-mono uppercase text-zinc-400 block mb-1">Publication Time (T_pub) *</label>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-1">
+            <label className="text-[10px] uppercase text-zinc-500 block">Publication Time (T_pub ISO)</label>
             <input
               type="text"
               required
               value={pubTime}
               onChange={(e) => setPubTime(e.target.value)}
-              placeholder="2022-02-23T16:00:00Z"
-              className="w-full bg-[#18181c] border border-zinc-700 rounded px-3 py-2 text-xs text-sky-300 font-mono focus:outline-none focus:border-sky-500"
+              className="w-full bg-black border border-zinc-800 text-white px-2.5 py-1.5 text-xs font-mono focus:border-white focus:outline-none"
             />
           </div>
 
-          <div>
-            <label className="text-xs font-mono uppercase text-zinc-400 block mb-1">Source Document Category</label>
-            <select
-              value={sourceType}
-              onChange={(e) => setSourceType(e.target.value)}
-              className="w-full bg-[#18181c] border border-zinc-700 rounded px-3 py-2 text-xs text-zinc-200 font-mono focus:outline-none"
-            >
-              <option value="advisory">Official Advisory / Alert</option>
-              <option value="threat_report">Commercial Threat Intelligence Report</option>
-              <option value="technical_paper">Independent Research / Academic Paper</option>
-              <option value="legal_indictment">Legal Indictment / Sanction Notice</option>
-              <option value="news_report">Investigative Journalism / Wire Report</option>
-            </select>
+          <div className="space-y-1">
+            <label className="text-[10px] uppercase text-zinc-500 block">Observation Incident Time (T_event ISO)</label>
+            <input
+              type="text"
+              placeholder="e.g. 2022-02-10T00:00:00Z"
+              value={obsTime}
+              onChange={(e) => setObsTime(e.target.value)}
+              className="w-full bg-black border border-zinc-800 text-white px-2.5 py-1.5 text-xs font-mono focus:border-white focus:outline-none"
+            />
           </div>
 
-          <div>
-            <label className="text-xs font-mono uppercase text-zinc-400 block mb-1">Reliability Tier</label>
+          <div className="space-y-1">
+            <label className="text-[10px] uppercase text-zinc-500 block">Reliability Tier</label>
             <select
               value={reliabilityTier}
               onChange={(e) => setReliabilityTier(e.target.value)}
-              className="w-full bg-[#18181c] border border-zinc-700 rounded px-3 py-2 text-xs text-zinc-200 font-mono focus:outline-none"
+              className="w-full bg-black border border-zinc-800 text-white px-2.5 py-1.5 text-xs font-mono focus:border-white focus:outline-none"
             >
-              <option value="verified_official">Verified Official (Law Enforcement / CISA)</option>
-              <option value="commercial_threat_intel">Commercial Threat Intel (Mandiant / Microsoft)</option>
-              <option value="independent_research">Independent Research (Citizen Lab / Amnesty)</option>
-              <option value="journalism">Journalism / Wire Outlet</option>
-              <option value="unverified">Unverified Forum / Anonymous Leak</option>
+              <option value="verified_official">Official Government Advisory / Court Indictment</option>
+              <option value="commercial_threat_intel">Tier-1 Commercial Threat Intel (FireEye, Mandiant)</option>
+              <option value="academic_forensic">Academic Forensic Laboratory (Citizen Lab)</option>
+              <option value="unverified_media">Syndicated Media / News Outlet</option>
             </select>
           </div>
         </div>
 
-        <div>
-          <label className="text-xs font-mono uppercase text-zinc-400 block mb-1">Raw Report Content *</label>
+        <div className="space-y-1">
+          <label className="text-[10px] uppercase text-zinc-500 block">Raw Report Content / Telemetry Text</label>
           <textarea
+            rows={7}
             required
-            rows={8}
+            placeholder="Paste raw markdown, threat advisory passage, IOC tables, or attribution notes here..."
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            placeholder="Paste raw report text, forensic indicators, and attribution statements..."
-            className="w-full bg-[#18181c] border border-zinc-700 rounded p-3 text-xs text-zinc-100 font-mono focus:outline-none focus:border-sky-500 resize-y leading-relaxed"
+            className="w-full bg-black border border-zinc-800 text-white p-3 text-xs font-mono focus:border-white focus:outline-none leading-relaxed"
           />
         </div>
 
-        <div className="flex justify-end pt-2">
+        <div className="flex items-center justify-between pt-2 border-t border-zinc-800">
+          <span className="text-[10px] text-zinc-500">
+            PAYLOAD VERIFICATION: SHA-256 + 64-BIT SIMHASH CALCULATED AUTOMATICALLY
+          </span>
           <button
             type="submit"
-            disabled={loading}
-            className="px-5 py-2.5 bg-sky-600 hover:bg-sky-500 disabled:bg-zinc-800 text-white rounded text-xs font-semibold uppercase tracking-wider font-mono flex items-center space-x-2 transition-colors"
+            disabled={loading || !title || !content}
+            className="px-4 py-2 bg-white text-black hover:bg-zinc-200 font-bold uppercase tracking-wider text-xs transition-colors disabled:bg-zinc-800 disabled:text-zinc-600"
           >
-            <UploadCloud className="w-4 h-4" />
-            <span>{loading ? 'Processing & Indexing...' : 'Ingest & Index Report'}</span>
+            {loading ? 'INGESTING & FINGERPRINTING...' : 'INGEST & INDEX DOCUMENT'}
           </button>
         </div>
       </form>
 
-      {/* Ingestion Response Card */}
+      {/* Ingestion Results Telemetry Card */}
       {result && (
-        <div className="bg-[#121215] border border-zinc-800 rounded-xl p-5 shadow-xl space-y-3">
-          <div className="flex items-center space-x-2 text-emerald-400">
-            <CheckCircle2 className="w-5 h-5" />
-            <h3 className="text-sm font-semibold font-mono">Report Successfully Ingested and Indexed</h3>
+        <div className="tactical-panel p-4 border border-zinc-800 space-y-3">
+          <div className="flex items-center justify-between border-b border-zinc-800 pb-2">
+            <div className="flex items-center space-x-2">
+              <CheckCircle2 className="w-4 h-4 text-white" />
+              <span className="text-white font-bold uppercase tracking-wider text-xs">
+                Ingestion Succeeded: Document {result.document_id}
+              </span>
+            </div>
+            <span className="text-zinc-400 text-[10px]">STATUS // COMMITTED TO DB</span>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs font-mono">
-            <div className="bg-zinc-900 p-2.5 rounded border border-zinc-800">
-              <span className="text-[10px] text-zinc-500 uppercase block">Document ID</span>
-              <span className="text-zinc-200"><code>{result.document_id}</code></span>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="bg-black p-2.5 border border-zinc-800">
+              <span className="text-[9px] uppercase text-zinc-500 block">Passages Chunked</span>
+              <span className="text-white font-bold text-base">{result.passages_count}</span>
             </div>
-            <div className="bg-zinc-900 p-2.5 rounded border border-zinc-800">
-              <span className="text-[10px] text-zinc-500 uppercase block">Passages Indexed</span>
-              <span className="text-sky-400 font-bold">{result.passages_count} chunks</span>
+            <div className="bg-black p-2.5 border border-zinc-800">
+              <span className="text-[9px] uppercase text-zinc-500 block">Entity Mentions</span>
+              <span className="text-white font-bold text-base">{result.entity_mentions_count}</span>
             </div>
-            <div className="bg-zinc-900 p-2.5 rounded border border-zinc-800">
-              <span className="text-[10px] text-zinc-500 uppercase block">Recognized Entities</span>
-              <span className="text-emerald-400 font-bold">{result.extracted_entities.length} detected</span>
+            <div className="bg-black p-2.5 border border-zinc-800">
+              <span className="text-[9px] uppercase text-zinc-500 block">SimHash Fingerprint</span>
+              <span className="text-zinc-200 font-mono text-[11px] truncate block">{result.simhash}</span>
             </div>
-            <div className="bg-zinc-900 p-2.5 rounded border border-zinc-800">
-              <span className="text-[10px] text-zinc-500 uppercase block">Syndication Status</span>
-              <span className={result.is_near_duplicate ? 'text-rose-400 font-bold' : 'text-emerald-400'}>
-                {result.is_near_duplicate ? 'Near-Duplicate Detected' : 'Original Text'}
+            <div className="bg-black p-2.5 border border-zinc-800">
+              <span className="text-[9px] uppercase text-zinc-500 block">Syndication Status</span>
+              <span className={`text-[11px] font-bold ${result.is_syndicated ? 'text-zinc-400 underline' : 'text-white'}`}>
+                {result.is_syndicated ? 'SYNDICATED COPY' : 'PRIMARY SOURCE'}
               </span>
             </div>
           </div>
 
-          {result.is_near_duplicate && (
-            <div className="p-3 bg-rose-950/40 border border-rose-800 rounded text-xs text-rose-300 font-mono">
-              <strong>Anti-Circularity Warning:</strong> This report matches prior document <code>{result.near_duplicate_of}</code> (SimHash distance: {result.simhash_distance}). It has been flagged as syndicated and will not count as independent corroboration.
-            </div>
-          )}
-
-          {result.extracted_entities.length > 0 && (
-            <div className="text-xs text-zinc-300 font-mono pt-2">
-              <span className="text-zinc-500">Auto-Resolved Entities:</span>{' '}
-              {result.extracted_entities.map((e: string, i: number) => (
-                <span key={i} className="inline-block bg-zinc-800 px-2 py-0.5 rounded text-zinc-200 mr-1.5 mt-1">
-                  {e}
-                </span>
-              ))}
+          {result.syndication_warning && (
+            <div className="p-3 bg-zinc-950 border border-zinc-700 text-xs">
+              <div className="text-white font-bold uppercase mb-1">Syndication Notice</div>
+              <div className="text-zinc-300 font-sans">{result.syndication_warning}</div>
             </div>
           )}
         </div>

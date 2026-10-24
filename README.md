@@ -6,7 +6,8 @@
   <a href="#core-architecture"><img src="https://img.shields.io/badge/Engine-Temporal_Intelligence-09090b?style=for-the-badge&logo=databricks&logoColor=38bdf8&labelColor=18181b" alt="Engine" /></a>
   <a href="#strict-four-timestamp-model"><img src="https://img.shields.io/badge/Temporal_Coordinates-4--Timestamp_Model-09090b?style=for-the-badge&logo=speedtest&logoColor=34d399&labelColor=18181b" alt="Temporal Coordinates" /></a>
   <a href="#interactive-temporal-relationship-graph"><img src="https://img.shields.io/badge/Graph-NetworkX_Topological-09090b?style=for-the-badge&logo=diagramsdotnet&logoColor=f43f5e&labelColor=18181b" alt="Graph Engine" /></a>
-  <a href="#6-automated-test-suite"><img src="https://img.shields.io/badge/Verification-25%20Passed-09090b?style=for-the-badge&logo=checkmarx&logoColor=10b981&labelColor=18181b" alt="Verification" /></a>
+  <a href="#6-automated-test-suite"><img src="https://img.shields.io/badge/Verification-35%20Passed-09090b?style=for-the-badge&logo=checkmarx&logoColor=10b981&labelColor=18181b" alt="Verification" /></a>
+  <a href="#stix-21-cryptographic-export"><img src="https://img.shields.io/badge/Export-STIX_2.1_OASIS-09090b?style=for-the-badge&logo=json&logoColor=e4e4e7&labelColor=18181b" alt="STIX 2.1" /></a>
 </p>
 
 <p align="center">
@@ -54,9 +55,9 @@ Instead of flattening history into a static snapshot, HistoryFather answers thre
 │   │       ├── dedup_engine.py         # 64-bit SimHash, MinHash shingling, & circular reporting detection
 │   │       ├── entity_resolution.py    # Deterministic canonical alias matching & Jaro-Winkler distance
 │   │       ├── temporal_engine.py      # 4-timestamp engine, point-in-time travel, & snapshot diffs
-│   │       ├── graph_engine.py         # NetworkX temporal graph projection & shortest pathfinder
+│   │       ├── graph_engine.py         # NetworkX temporal graph projection, betweenness centrality, & shortest pathfinder
 │   │       ├── source_intelligence.py  # Source reliability scoring & wire reprint syndication clusters
-│   │       ├── dossier_engine.py       # Case workspace manager & Markdown/HTML/JSON dossier exports
+│   │       ├── dossier_engine.py       # Case workspace manager, Markdown/HTML/JSON & STIX 2.1 SHA-256 exports
 │   │       ├── ingestion.py            # Passage chunking, FTS5 indexing, & entity auto-tagging
 │   │       └── seed_data.py            # Verified intelligence cases (SolarWinds, NotPetya, Ronin, Pegasus, Stuxnet)
 │   ├── tests/
@@ -70,19 +71,19 @@ Instead of flattening history into a static snapshot, HistoryFather answers thre
 ├── frontend/
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── SearchTimelineView.tsx  # Dual-track timeline & point-in-time search
-│   │   │   ├── RelationshipGraphView.tsx # Interactive force-directed SVG graph & edge evidence
+│   │   │   ├── SearchTimelineView.tsx  # Dual-track timeline, temporal playback scrubber, & point-in-time search
+│   │   │   ├── RelationshipGraphView.tsx # Force-directed SVG graph, betweenness centrality, & shortest pathfinder
 │   │   │   ├── TemporalDiffView.tsx    # Snapshot comparison engine ($T_1$ vs $T_2$)
-│   │   │   ├── SourceIntelligenceView.tsx # Wire reprint syndication & circularity warnings
-│   │   │   ├── WorkspaceDossierView.tsx # Hypothesis ledger & multi-format export
+│   │   │   ├── SourceIntelligenceView.tsx # Wire reprint syndication, 64-bit SimHash vector inspector, & circularity warnings
+│   │   │   ├── WorkspaceDossierView.tsx # Hypothesis ledger & multi-format export (Markdown, HTML, JSON, STIX 2.1)
 │   │   │   ├── IngestionHubView.tsx    # Document ingestion adapter & auto-dedup
 │   │   │   └── EvidenceInspector.tsx   # Slide-out verbatim quote & 4-timestamp drawer
 │   │   ├── services/
 │   │   │   └── api.ts                  # Typed async API client
 │   │   ├── types/
 │   │   │   └── index.ts                # TypeScript domain models
-│   │   ├── App.tsx                     # Main workstation layout
-│   │   └── index.css                   # Dark intelligence workstation styling
+│   │   ├── App.tsx                     # Main workstation layout with Command Palette (⌘K) & telemetry
+│   │   └── index.css                   # Obsidian black-and-white industrial brutalist typography & styling
 │   ├── dist/                           # Compiled production frontend bundle
 │   ├── package.json
 │   ├── tailwind.config.js
@@ -168,6 +169,7 @@ The database comes pre-seeded with 5 comprehensive real-world cases:
 | `GET` | `/api/workspaces/{id}/export/markdown` | Download executive Markdown intelligence report |
 | `GET` | `/api/workspaces/{id}/export/html` | Standalone print-ready dark intelligence HTML briefing |
 | `GET` | `/api/workspaces/{id}/export/json` | Export structured JSON dossier |
+| `GET` | `/api/workspaces/{id}/export/stix` | OASIS STIX 2.1 threat bundle with canonical SHA-256 integrity seal |
 | `POST` | `/api/ingest` | Ingest new public report, auto-chunk, index into FTS5, and detect duplicates |
 | `POST` | `/api/admin/reseed` | Re-seed database with standard historical cases |
 
