@@ -14,8 +14,29 @@ DB_DIR = Path(__file__).resolve().parent.parent.parent / "data"
 DB_PATH = DB_DIR / "historyfather.db"
 SCHEMA_PATH = Path(__file__).resolve().parent / "schema.sql"
 
+def secure_db_permissions(path: Path) -> None:
+    """Enforce restrictive permissions (0700 dir, 0600 file) to protect data at rest."""
+    try:
+        if path.parent.exists():
+            os.chmod(path.parent, 0o700)
+        if path.exists():
+            os.chmod(path, 0o600)
+        # Also protect WAL and SHM files if they exist
+        for ext in ["-wal", "-shm"]:
+            aux = Path(f"{path}{ext}")
+            if aux.exists():
+                os.chmod(aux, 0o600)
+    except OSError:
+        pass
+
 def get_db_path() -> Path:
-    DB_DIR.mkdir(parents=True, exist_ok=True)
+    # Set restrictive umask for newly created database files
+    old_umask = os.umask(0o077)
+    try:
+        DB_DIR.mkdir(parents=True, exist_ok=True)
+        secure_db_permissions(DB_PATH)
+    finally:
+        os.umask(old_umask)
     return DB_PATH
 
 def get_connection(db_file: Optional[str] = None) -> sqlite3.Connection:
@@ -26,6 +47,7 @@ def get_connection(db_file: Optional[str] = None) -> sqlite3.Connection:
     if target != ":memory:":
         conn.execute("PRAGMA journal_mode = WAL;")
         conn.execute("PRAGMA synchronous = NORMAL;")
+        secure_db_permissions(Path(target))
     return conn
 
 def init_db(db_file: Optional[str] = None) -> None:

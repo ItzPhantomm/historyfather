@@ -227,18 +227,18 @@ class GraphResponse(BaseModel):
 
 # --- Temporal Search & Filter Query ---
 class TemporalSearchQuery(BaseModel):
-    query: Optional[str] = None
+    query: Optional[str] = Field(default=None, max_length=256)
     entity_types: Optional[List[EntityType]] = None
     claim_statuses: Optional[List[ClaimStatus]] = None
     certainty_tiers: Optional[List[CertaintyTier]] = None
-    sources: Optional[List[str]] = None
-    pub_time_min: Optional[str] = None
-    pub_time_max: Optional[str] = None
-    event_time_min: Optional[str] = None
-    event_time_max: Optional[str] = None
-    as_of_time: Optional[str] = None # Point-in-time "what was known then"
-    limit: int = 25
-    offset: int = 0
+    sources: Optional[List[str]] = Field(default=None, max_length=50)
+    pub_time_min: Optional[str] = Field(default=None, max_length=50)
+    pub_time_max: Optional[str] = Field(default=None, max_length=50)
+    event_time_min: Optional[str] = Field(default=None, max_length=50)
+    event_time_max: Optional[str] = Field(default=None, max_length=50)
+    as_of_time: Optional[str] = Field(default=None, max_length=50) # Point-in-time "what was known then"
+    limit: int = Field(default=25, ge=1, le=100)
+    offset: int = Field(default=0, ge=0, le=10000)
 
 class SearchResultItem(BaseModel):
     type: Literal["passage", "claim", "entity", "event"]
@@ -265,9 +265,9 @@ class SearchResponse(BaseModel):
 
 # --- Temporal Diff Models ---
 class TemporalDiffRequest(BaseModel):
-    snapshot_a_time: str # Date A (e.g. "2021-01-01T00:00:00Z")
-    snapshot_b_time: str # Date B (e.g. "2024-01-01T00:00:00Z")
-    entity_id: Optional[str] = None
+    snapshot_a_time: str = Field(..., min_length=4, max_length=50) # Date A (e.g. "2021-01-01T00:00:00Z")
+    snapshot_b_time: str = Field(..., min_length=4, max_length=50) # Date B (e.g. "2024-01-01T00:00:00Z")
+    entity_id: Optional[str] = Field(default=None, max_length=128)
 
 class ChangedRelationshipDiff(BaseModel):
     relationship_id: str
@@ -342,18 +342,18 @@ class SourceIntelligenceResponse(BaseModel):
 # --- Investigation Workspace Models ---
 class WorkspaceItemAdd(BaseModel):
     item_type: Literal["entity", "event", "claim", "passage", "document", "relationship"]
-    item_id: str
-    analyst_note: Optional[str] = None
+    item_id: str = Field(..., min_length=1, max_length=128)
+    analyst_note: Optional[str] = Field(default=None, max_length=5000)
     hypothesis_stance: Literal["supports_hypothesis", "refutes_hypothesis", "neutral"] = "neutral"
 
 class WorkspaceNoteCreate(BaseModel):
-    title: str
-    content: str
+    title: str = Field(..., min_length=1, max_length=200)
+    content: str = Field(..., min_length=1, max_length=50000)
 
 class WorkspaceCreate(BaseModel):
-    title: str
-    description: Optional[str] = None
-    analyst_name: Optional[str] = "Lead Investigator"
+    title: str = Field(..., min_length=1, max_length=200)
+    description: Optional[str] = Field(default=None, max_length=2000)
+    analyst_name: Optional[str] = Field(default="Lead Investigator", max_length=100)
 
 class WorkspaceDetail(BaseModel):
     id: str
@@ -367,14 +367,14 @@ class WorkspaceDetail(BaseModel):
 
 # --- Ingestion Models ---
 class IngestDocumentRequest(BaseModel):
-    title: str
-    source_name: str
-    source_url: Optional[str] = None
-    source_type: str = "threat_report"
-    publication_time: str
-    observation_time: Optional[str] = None
-    content: str
-    reliability_tier: str = "commercial_threat_intel"
+    title: str = Field(..., min_length=1, max_length=300)
+    source_name: str = Field(..., min_length=1, max_length=150)
+    source_url: Optional[str] = Field(default=None, max_length=2048)
+    source_type: str = Field(default="threat_report", max_length=50)
+    publication_time: str = Field(..., min_length=4, max_length=50)
+    observation_time: Optional[str] = Field(default=None, max_length=50)
+    content: str = Field(..., min_length=10, max_length=250000)
+    reliability_tier: str = Field(default="commercial_threat_intel", max_length=50)
 
 class IngestDocumentResponse(BaseModel):
     document_id: str

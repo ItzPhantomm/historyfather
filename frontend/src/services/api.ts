@@ -162,6 +162,11 @@ export const api = {
   },
 
   async reseed(): Promise<any> {
-    return fetchJson('/api/admin/reseed', { method: 'POST' });
+    return fetchJson('/api/admin/reseed', {
+      method: 'POST',
+      headers: {
+        'X-Admin-Confirm': 'reseed'
+      }
+    });
   }
 };

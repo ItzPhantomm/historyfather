@@ -2,8 +2,8 @@
   <defs>
     <!-- Gradients -->
     <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#08090c"/>
-      <stop offset="50%" stop-color="#0d0e15"/>
+      <stop offset="0%" stop-color="#08090d"/>
+      <stop offset="50%" stop-color="#0e1017"/>
       <stop offset="100%" stop-color="#050608"/>
     </linearGradient>
 
@@ -21,8 +21,8 @@
 
     <linearGradient id="radarSweep" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" stop-color="#38bdf8" stop-opacity="0"/>
-      <stop offset="85%" stop-color="#38bdf8" stop-opacity="0.12"/>
-      <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.75"/>
+      <stop offset="85%" stop-color="#38bdf8" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.65"/>
     </linearGradient>
 
     <!-- Filter Glow -->
@@ -60,11 +60,7 @@
       0%, 100% { opacity: 1; }
       50% { opacity: 0.25; }
     }
-    @keyframes scanline {
-      0% { transform: translateY(-240px); }
-      100% { transform: translateY(240px); }
-    }
-    .grid-line { stroke: #1e2230; stroke-width: 0.75; }
+    .grid-line { stroke: #191f2e; stroke-width: 0.75; }
     .packet-path {
       stroke-dasharray: 60 340;
       animation: pulsePacket 4s linear infinite;
@@ -79,17 +75,14 @@
     .live-indicator {
       animation: blink 1.6s ease-in-out infinite;
     }
-    .scan {
-      animation: scanline 8s linear infinite;
-    }
   </style>
 
   <!-- Background -->
   <rect width="900" height="240" fill="url(#bgGrad)" rx="12"/>
-  <rect width="900" height="240" fill="none" stroke="#1f2433" stroke-width="1.5" rx="12"/>
+  <rect width="900" height="240" fill="none" stroke="#1f273b" stroke-width="1.5" rx="12"/>
 
   <!-- Grid System -->
-  <g opacity="0.6">
+  <g opacity="0.65">
     <!-- Verticals -->
     <line x1="100" y1="0" x2="100" y2="240" class="grid-line" />
     <line x1="200" y1="0" x2="200" y2="240" class="grid-line" />
@@ -107,10 +100,10 @@
   </g>
 
   <!-- Circuit Trace Lines with Animated Light Packets -->
-  <path d="M 40 20 L 180 20 L 220 60 L 680 60 L 720 20 L 860 20" fill="none" stroke="#1c253b" stroke-width="2"/>
+  <path d="M 40 20 L 180 20 L 220 60 L 680 60 L 720 20 L 860 20" fill="none" stroke="#172033" stroke-width="2"/>
   <path d="M 40 20 L 180 20 L 220 60 L 680 60 L 720 20 L 860 20" fill="none" stroke="#38bdf8" stroke-width="2.5" class="packet-path" filter="url(#glow)"/>
 
-  <path d="M 40 220 L 260 220 L 300 180 L 600 180 L 640 220 L 860 220" fill="none" stroke="#1c253b" stroke-width="2"/>
+  <path d="M 40 220 L 260 220 L 300 180 L 600 180 L 640 220 L 860 220" fill="none" stroke="#172033" stroke-width="2"/>
   <path d="M 40 220 L 260 220 L 300 180 L 600 180 L 640 220 L 860 220" fill="none" stroke="#c084fc" stroke-width="2.5" class="packet-path" style="animation-duration: 5s; animation-direction: reverse;" filter="url(#glow)"/>
 
   <!-- Radar Sweep Horizon -->
@@ -124,25 +117,29 @@
     <path d="M 884 212 L 884 224 L 872 224" fill="none"/>
   </g>
 
-  <!-- Header Metadata Pill -->
+  <!-- Header Metadata Pill with Vector Terminal Prompt Icon -->
   <g transform="translate(48, 44)">
-    <rect width="180" height="24" rx="4" fill="#121622" stroke="#252d42" stroke-width="1"/>
-    <circle cx="14" cy="12" r="3.5" fill="#10b981" class="live-indicator"/>
-    <text x="26" y="16" fill="#a1a1aa" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', monospace" font-size="10.5" font-weight="600" letter-spacing="1">
+    <rect width="210" height="24" rx="4" fill="#101420" stroke="#1f273b" stroke-width="1"/>
+    <!-- Vector Prompt Icon >_ -->
+    <path d="M 10 8 L 14 12 L 10 16 M 16 16 L 21 16" stroke="#10b981" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <text x="28" y="16" fill="#a1a1aa" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', monospace" font-size="10.5" font-weight="600" letter-spacing="1">
       SYS_CORE // ONLINE
     </text>
-    <text x="146" y="16" fill="#38bdf8" font-family="monospace" font-size="10" font-weight="700">
+    <text x="174" y="16" fill="#38bdf8" font-family="monospace" font-size="10" font-weight="700">
       v1.4
     </text>
   </g>
 
-  <!-- Right Pill: Target Coordinate -->
-  <g transform="translate(680, 44)">
-    <rect width="170" height="24" rx="4" fill="#121622" stroke="#252d42" stroke-width="1"/>
-    <text x="14" y="16" fill="#71717a" font-family="monospace" font-size="10.5" letter-spacing="0.5">
+  <!-- Right Pill: Target Coordinate with Clock/Epoch Icon -->
+  <g transform="translate(670, 44)">
+    <rect width="180" height="24" rx="4" fill="#101420" stroke="#1f273b" stroke-width="1"/>
+    <!-- Vector Clock Icon -->
+    <circle cx="16" cy="12" r="5" fill="none" stroke="#38bdf8" stroke-width="1.2"/>
+    <path d="M 16 9.5 L 16 12 L 18 13.5" stroke="#38bdf8" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+    <text x="27" y="16" fill="#71717a" font-family="monospace" font-size="10.5" letter-spacing="0.5">
       EPOCH: <tspan fill="#34d399">2026.HIST</tspan>
     </text>
-    <circle cx="152" cy="12" r="3.5" fill="#38bdf8" class="pulse-dot"/>
+    <circle cx="164" cy="12" r="3.5" fill="#38bdf8" class="pulse-dot"/>
   </g>
 
   <!-- Center Typography -->
@@ -158,28 +155,34 @@
     </text>
   </g>
 
-  <!-- Bottom Metric Trackers -->
+  <!-- Bottom Metric Trackers with Authentic Vector Icons -->
   <g transform="translate(48, 196)">
-    <!-- Metric 1 -->
+    <!-- Metric 1: Graph Topology Icon -->
     <g transform="translate(0, 0)">
-      <circle cx="6" cy="6" r="3" fill="#38bdf8"/>
-      <text x="16" y="9" font-family="monospace" font-size="11" fill="#cbd5e1" font-weight="500">
+      <circle cx="4" cy="4" r="2.2" fill="#38bdf8"/>
+      <circle cx="14" cy="4" r="2.2" fill="#38bdf8"/>
+      <circle cx="9" cy="12" r="2.2" fill="#38bdf8"/>
+      <line x1="4" y1="4" x2="14" y2="4" stroke="#38bdf8" stroke-width="0.9"/>
+      <line x1="4" y1="4" x2="9" y2="12" stroke="#38bdf8" stroke-width="0.9"/>
+      <line x1="14" y1="4" x2="9" y2="12" stroke="#38bdf8" stroke-width="0.9"/>
+      <text x="24" y="10" font-family="monospace" font-size="11" fill="#cbd5e1" font-weight="500">
         TEMPORAL_GRAPH: <tspan fill="#38bdf8" font-weight="700">DETERMINISTIC</tspan>
       </text>
     </g>
 
-    <!-- Metric 2 -->
-    <g transform="translate(260, 0)">
-      <circle cx="6" cy="6" r="3" fill="#10b981"/>
-      <text x="16" y="9" font-family="monospace" font-size="11" fill="#cbd5e1" font-weight="500">
+    <!-- Metric 2: Verified Shield Icon -->
+    <g transform="translate(280, 0)">
+      <path d="M 6 1 L 12 -1.5 L 12 4 C 12 8 6 11 6 11 C 6 11 0 8 0 4 L 0 -1.5 Z" fill="none" stroke="#10b981" stroke-width="1.2"/>
+      <path d="M 3 4 L 5 6 L 9 2" fill="none" stroke="#10b981" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="20" y="10" font-family="monospace" font-size="11" fill="#cbd5e1" font-weight="500">
         EVIDENCE_PROVENANCE: <tspan fill="#10b981" font-weight="700">100% VERIFIED</tspan>
       </text>
     </g>
 
-    <!-- Metric 3 -->
-    <g transform="translate(560, 0)">
-      <circle cx="6" cy="6" r="3" fill="#c084fc"/>
-      <text x="16" y="9" font-family="monospace" font-size="11" fill="#cbd5e1" font-weight="500">
+    <!-- Metric 3: Circularity / Refresh Loop Icon -->
+    <g transform="translate(600, 0)">
+      <path d="M 3 6 A 4.5 4.5 0 1 1 10.5 9.5 M 10.5 5.5 L 10.5 9.5 L 6.5 9.5" fill="none" stroke="#c084fc" stroke-width="1.2" stroke-linecap="round"/>
+      <text x="18" y="10" font-family="monospace" font-size="11" fill="#cbd5e1" font-weight="500">
         CIRCULARITY_FILTER: <tspan fill="#c084fc" font-weight="700">ACTIVE</tspan>
       </text>
     </g>

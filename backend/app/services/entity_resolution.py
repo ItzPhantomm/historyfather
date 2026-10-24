@@ -29,15 +29,20 @@ def jaro_winkler_similarity(s1: str, s2: str, p: float = 0.1) -> float:
     """
     Compute Jaro-Winkler similarity metric between two strings.
     Value is between 0.0 (no similarity) and 1.0 (exact match).
+    Bounded against ReDoS / quadratic CPU exhaustion.
     """
-    s1 = s1.lower().strip()
-    s2 = s2.lower().strip()
+    s1 = s1[:100].lower().strip()
+    s2 = s2[:100].lower().strip()
     if s1 == s2:
         return 1.0
     if not s1 or not s2:
         return 0.0
 
     len1, len2 = len(s1), len(s2)
+    # Early prune if length difference is too large to reach threshold
+    if abs(len1 - len2) > 25:
+        return 0.0
+
     max_dist = max(len1, len2) // 2 - 1
     if max_dist < 0:
         max_dist = 0
@@ -109,10 +114,12 @@ class EntityResolver:
         """
         Given an input term or query token, resolve potential matching entities.
         Returns explainable matches ordered by confidence.
+        Input length is bounded and comparisons are early-pruned to prevent DoS.
         """
         if not term or not term.strip():
             return []
 
+        term = term[:128].strip()
         conn = self._get_conn()
         norm_term = normalize_name(term)
         comp_term = compact_name(term)
@@ -193,7 +200,7 @@ class EntityResolver:
                     ))
 
         # Step 4: Fuzzy String Similarity (Jaro-Winkler + Token Sort)
-        if len(norm_term) >= 3:
+        if 3 <= len(norm_term) <= 64:
             cur = conn.execute(
                 """
                 SELECT a.entity_id, e.canonical_name, a.alias, a.alias_type
@@ -206,8 +213,12 @@ class EntityResolver:
                 if eid in seen_entity_ids:
                     continue
 
-                sim_jw = jaro_winkler_similarity(norm_term, normalize_name(row["alias"]))
-                sim_token = token_sort_ratio(norm_term, normalize_name(row["alias"]))
+                alias_norm = normalize_name(row["alias"])
+                if abs(len(norm_term) - len(alias_norm)) > 20:
+                    continue
+
+                sim_jw = jaro_winkler_similarity(norm_term, alias_norm)
+                sim_token = token_sort_ratio(norm_term, alias_norm)
                 best_sim = max(sim_jw, sim_token)
 
                 if best_sim >= min_confidence:
@@ -225,9 +236,9 @@ class EntityResolver:
                         )
                     ))
 
-        # Sort matches descending by similarity score
+        # Sort matches descending by similarity score and limit to top 20
         matches.sort(key=lambda m: m.similarity_score, reverse=True)
-        return matches
+        return matches[:20]
 
     def get_entity_cluster(self, entity_id: str) -> Optional[Dict[str, Any]]:
         """Retrieve canonical entity details with all aliases and evidence links."""

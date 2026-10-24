@@ -45,7 +45,7 @@ class TemporalEngine:
         if q_term:
             resolved_entities = self.resolver.resolve_term(q_term)
 
-        matched_entity_ids = [m.matched_entity_id for m in resolved_entities]
+        matched_entity_ids = [m.matched_entity_id for m in resolved_entities][:10]
 
         # Step 2: Build SQL query with temporal and integrity constraints
         sql_clauses = ["1=1"]
@@ -63,10 +63,11 @@ class TemporalEngine:
             sql_clauses.append("d.publication_time <= ?")
             params.append(filter_query.pub_time_max)
 
-        if filter_query.sources:
-            placeholders = ",".join("?" for _ in filter_query.sources)
+        if filter_query.sources and len(filter_query.sources) > 0:
+            safe_sources = filter_query.sources[:20]
+            placeholders = ",".join("?" for _ in safe_sources)
             sql_clauses.append(f"d.source_name IN ({placeholders})")
-            params.extend(filter_query.sources)
+            params.extend(safe_sources)
 
         where_sql = " AND ".join(sql_clauses)
 
@@ -77,8 +78,8 @@ class TemporalEngine:
             # Clean search term for FTS5 syntax
             clean_q = "".join(c for c in q_term if c.isalnum() or c.isspace()).strip()
             if clean_q:
-                # FTS phrase or prefix search
-                fts_phrase = f'"{clean_q}"*'
+                tokens = clean_q.split()[:8]
+                fts_phrase = " ".join(f'"{t}"*' for t in tokens)
                 fts_query = f"""
                 SELECT p.id as passage_id, p.document_id, p.text as passage_text, p.passage_index,
                        d.title as doc_title, d.source_name, d.publication_time, d.observation_time,
@@ -116,14 +117,16 @@ class TemporalEngine:
         if as_of:
             claim_clauses.append("c.publication_time <= ?")
             claim_params.append(as_of)
-        if filter_query.claim_statuses:
-            ph = ",".join("?" for _ in filter_query.claim_statuses)
+        if filter_query.claim_statuses and len(filter_query.claim_statuses) > 0:
+            safe_statuses = filter_query.claim_statuses[:10]
+            ph = ",".join("?" for _ in safe_statuses)
             claim_clauses.append(f"c.status IN ({ph})")
-            claim_params.extend(filter_query.claim_statuses)
-        if filter_query.certainty_tiers:
-            ph = ",".join("?" for _ in filter_query.certainty_tiers)
+            claim_params.extend(safe_statuses)
+        if filter_query.certainty_tiers and len(filter_query.certainty_tiers) > 0:
+            safe_tiers = filter_query.certainty_tiers[:10]
+            ph = ",".join("?" for _ in safe_tiers)
             claim_clauses.append(f"c.certainty_tier IN ({ph})")
-            claim_params.extend(filter_query.certainty_tiers)
+            claim_params.extend(safe_tiers)
         if filter_query.event_time_min:
             claim_clauses.append("c.alleged_event_time >= ?")
             claim_params.append(filter_query.event_time_min)

@@ -47,12 +47,12 @@
       100% { stroke-dashoffset: 0; }
     }
     @keyframes nodePulse {
-      0%, 100% { r: 16; opacity: 0.9; }
-      50% { r: 21; opacity: 0.5; }
+      0%, 100% { r: 18; opacity: 0.85; }
+      50% { r: 24; opacity: 0.45; }
     }
     @keyframes satellitePulse {
-      0%, 100% { r: 12; opacity: 0.85; }
-      50% { r: 15; opacity: 0.45; }
+      0%, 100% { r: 15; opacity: 0.8; }
+      50% { r: 19; opacity: 0.4; }
     }
     @keyframes timeTravelScrub {
       0% { transform: translateX(60px); }
@@ -64,7 +64,7 @@
       50% { transform: translateY(-3px); }
     }
 
-    .edge-bg { stroke: #1e2436; stroke-width: 1.5; fill: none; }
+    .edge-bg { stroke: #1a2030; stroke-width: 1.5; fill: none; }
     .packet-fast {
       fill: none;
       stroke-dasharray: 40 280;
@@ -110,10 +110,10 @@
 
   <!-- Background Canvas -->
   <rect width="900" height="360" fill="url(#canvasBg)" rx="14"/>
-  <rect width="900" height="360" fill="none" stroke="#212738" stroke-width="1.5" rx="14"/>
+  <rect width="900" height="360" fill="none" stroke="#1f273b" stroke-width="1.5" rx="14"/>
 
   <!-- Subtle Tactical Grid Overlay -->
-  <g opacity="0.35" stroke="#1c2233" stroke-width="0.7">
+  <g opacity="0.3" stroke="#172033" stroke-width="0.75">
     <line x1="80" y1="0" x2="80" y2="360"/>
     <line x1="260" y1="0" x2="260" y2="360"/>
     <line x1="450" y1="0" x2="450" y2="360"/>
@@ -124,18 +124,21 @@
     <line x1="0" y1="230" x2="900" y2="230"/>
   </g>
 
-  <!-- Top HUD Status Bar -->
+  <!-- Top HUD Status Bar with Vector Icons -->
   <g transform="translate(32, 28)">
-    <rect width="250" height="22" rx="4" fill="#10141f" stroke="#1f273b" stroke-width="1"/>
-    <circle cx="12" cy="11" r="3" fill="#38bdf8"/>
+    <rect width="250" height="22" rx="4" fill="#0f131f" stroke="#1c253b" stroke-width="1"/>
+    <!-- Vector Graph Node Icon -->
+    <circle cx="12" cy="11" r="2.5" fill="#38bdf8"/>
     <text x="22" y="15" fill="#94a3b8" font-family="monospace" font-size="10" font-weight="600" letter-spacing="1">
       TEMPORAL_GRAPH // LIVE RECONSTRUCTION
     </text>
   </g>
 
   <g transform="translate(638, 28)">
-    <rect width="230" height="22" rx="4" fill="#10141f" stroke="#1f273b" stroke-width="1"/>
-    <text x="12" y="15" fill="#a1a1aa" font-family="monospace" font-size="10">
+    <rect width="230" height="22" rx="4" fill="#0f131f" stroke="#1c253b" stroke-width="1"/>
+    <!-- Vector Verified Shield Icon -->
+    <path d="M 12 7 L 16 9 L 16 12 C 16 14.5 12 16 12 16 C 12 16 8 14.5 8 12 L 8 9 Z" fill="none" stroke="#34d399" stroke-width="1"/>
+    <text x="24" y="15" fill="#a1a1aa" font-family="monospace" font-size="10">
       PROVENANCE: <tspan fill="#34d399" font-weight="700">VERIFIABLE_EXCERPT</tspan>
     </text>
   </g>
@@ -160,69 +163,89 @@
   <!-- Cross-Edge: Top-Left (220,85) -> Bottom-Left (180,220) -->
   <path d="M 220 85 C 160 130 160 170 180 220" class="edge-bg" stroke-dasharray="3 3"/>
 
-  <!-- Edge Badges (Relationship Types) -->
+  <!-- Edge Badges (Relationship Types) with Clean Vector Borders -->
   <g transform="translate(320, 102)" class="floating-badge">
-    <rect width="66" height="18" rx="3" fill="#141824" stroke="#25304a" stroke-width="1"/>
+    <rect width="66" height="18" rx="3" fill="#121624" stroke="#222c42" stroke-width="1"/>
     <text x="33" y="12" fill="#38bdf8" font-family="monospace" font-size="9" font-weight="700" text-anchor="middle">TARGETS</text>
   </g>
 
   <g transform="translate(540, 102)" class="floating-badge">
-    <rect width="66" height="18" rx="3" fill="#141824" stroke="#25304a" stroke-width="1"/>
+    <rect width="66" height="18" rx="3" fill="#121624" stroke="#222c42" stroke-width="1"/>
     <text x="33" y="12" fill="#f59e0b" font-family="monospace" font-size="9" font-weight="700" text-anchor="middle">DEPLOYS</text>
   </g>
 
   <g transform="translate(290, 190)">
-    <rect width="90" height="18" rx="3" fill="#141824" stroke="#25304a" stroke-width="1"/>
-    <text x="45" y="12" fill="#818cf8" font-family="monospace" font-size="9" font-weight="700" text-anchor="middle">ATTRIBUTED_TO</text>
+    <rect width="92" height="18" rx="3" fill="#121624" stroke="#222c42" stroke-width="1"/>
+    <text x="46" y="12" fill="#818cf8" font-family="monospace" font-size="9" font-weight="700" text-anchor="middle">ATTRIBUTED_TO</text>
   </g>
 
   <g transform="translate(560, 190)">
-    <rect width="84" height="18" rx="3" fill="#141824" stroke="#25304a" stroke-width="1"/>
+    <rect width="84" height="18" rx="3" fill="#121624" stroke="#222c42" stroke-width="1"/>
     <text x="42" y="12" fill="#34d399" font-family="monospace" font-size="9" font-weight="700" text-anchor="middle">EXPLOITS</text>
   </g>
 
-  <!-- Node 1: Top-Left (SolarWinds Orion) -->
+  <!-- Node 1: Top-Left (SolarWinds Orion - Enterprise Server Rack Icon) -->
   <g transform="translate(220, 85)">
-    <circle cx="0" cy="0" r="14" fill="#0c121e" stroke="#38bdf8" stroke-width="2"/>
-    <circle cx="0" cy="0" r="16" fill="none" stroke="#38bdf8" stroke-width="1" class="sat-halo-1"/>
-    <circle cx="0" cy="0" r="5" fill="#38bdf8"/>
-    <text x="0" y="-22" fill="#f8fafc" font-family="-apple-system, sans-serif" font-size="12" font-weight="700" text-anchor="middle">SolarWinds Orion</text>
-    <text x="0" y="-10" fill="#71717a" font-family="monospace" font-size="9" text-anchor="middle">ORGANIZATION</text>
+    <circle cx="0" cy="0" r="16" fill="#0b111c" stroke="#38bdf8" stroke-width="2"/>
+    <circle cx="0" cy="0" r="18" fill="none" stroke="#38bdf8" stroke-width="1" class="sat-halo-1"/>
+    <!-- Vector Server Rack Icon -->
+    <rect x="-6" y="-5" width="12" height="4" rx="0.8" fill="none" stroke="#38bdf8" stroke-width="1.1"/>
+    <circle cx="3" cy="-3" r="0.6" fill="#38bdf8"/>
+    <rect x="-6" y="1" width="12" height="4" rx="0.8" fill="none" stroke="#38bdf8" stroke-width="1.1"/>
+    <circle cx="3" cy="3" r="0.6" fill="#38bdf8"/>
+    <text x="0" y="-24" fill="#f8fafc" font-family="-apple-system, sans-serif" font-size="12" font-weight="700" text-anchor="middle">SolarWinds Orion</text>
+    <text x="0" y="-12" fill="#71717a" font-family="monospace" font-size="9" text-anchor="middle">ORGANIZATION</text>
   </g>
 
-  <!-- Node 2: Top-Right (SUNBURST Backdoor) -->
+  <!-- Node 2: Top-Right (SUNBURST Backdoor - Binary Malware Bug Icon) -->
   <g transform="translate(680, 85)">
-    <circle cx="0" cy="0" r="14" fill="#181308" stroke="#f59e0b" stroke-width="2"/>
-    <circle cx="0" cy="0" r="16" fill="none" stroke="#f59e0b" stroke-width="1" class="sat-halo-2"/>
-    <circle cx="0" cy="0" r="5" fill="#f59e0b"/>
-    <text x="0" y="-22" fill="#f8fafc" font-family="-apple-system, sans-serif" font-size="12" font-weight="700" text-anchor="middle">SUNBURST</text>
-    <text x="0" y="-10" fill="#71717a" font-family="monospace" font-size="9" text-anchor="middle">MALWARE // TROJAN</text>
+    <circle cx="0" cy="0" r="16" fill="#171206" stroke="#f59e0b" stroke-width="2"/>
+    <circle cx="0" cy="0" r="18" fill="none" stroke="#f59e0b" stroke-width="1" class="sat-halo-2"/>
+    <!-- Vector Malware Bug Icon -->
+    <ellipse cx="0" cy="1" rx="4" ry="5" fill="none" stroke="#f59e0b" stroke-width="1.1"/>
+    <path d="M -2 -4 L 0 -2.5 L 2 -4 M -6 -1 L -3 -0.5 M 6 -1 L 3 -0.5 M -6 3 L -3 2.5 M 6 3 L 3 2.5" stroke="#f59e0b" stroke-width="1.1" stroke-linecap="round"/>
+    <text x="0" y="-24" fill="#f8fafc" font-family="-apple-system, sans-serif" font-size="12" font-weight="700" text-anchor="middle">SUNBURST</text>
+    <text x="0" y="-12" fill="#71717a" font-family="monospace" font-size="9" text-anchor="middle">MALWARE // TROJAN</text>
   </g>
 
-  <!-- Node 3: Bottom-Left (Sandworm / NotPetya Cluster) -->
+  <!-- Node 3: Bottom-Left (Sandworm Team - GRU Unit 74455 - Mesh Node Icon) -->
   <g transform="translate(180, 220)">
-    <circle cx="0" cy="0" r="14" fill="#130b1c" stroke="#a855f7" stroke-width="2"/>
-    <circle cx="0" cy="0" r="16" fill="none" stroke="#a855f7" stroke-width="1" class="sat-halo-3"/>
-    <circle cx="0" cy="0" r="5" fill="#a855f7"/>
-    <text x="0" y="26" fill="#f8fafc" font-family="-apple-system, sans-serif" font-size="12" font-weight="700" text-anchor="middle">Sandworm Team</text>
-    <text x="0" y="38" fill="#71717a" font-family="monospace" font-size="9" text-anchor="middle">GRU UNIT 74455</text>
+    <circle cx="0" cy="0" r="16" fill="#120a1b" stroke="#a855f7" stroke-width="2"/>
+    <circle cx="0" cy="0" r="18" fill="none" stroke="#a855f7" stroke-width="1" class="sat-halo-3"/>
+    <!-- Vector Mesh Cluster Icon -->
+    <circle cx="-3.5" cy="-2.5" r="1.5" fill="#a855f7"/>
+    <circle cx="3.5" cy="-2.5" r="1.5" fill="#a855f7"/>
+    <circle cx="0" cy="3.5" r="1.5" fill="#a855f7"/>
+    <line x1="-3.5" y1="-2.5" x2="3.5" y2="-2.5" stroke="#a855f7" stroke-width="0.9"/>
+    <line x1="-3.5" y1="-2.5" x2="0" y2="3.5" stroke="#a855f7" stroke-width="0.9"/>
+    <line x1="3.5" y1="-2.5" x2="0" y2="3.5" stroke="#a855f7" stroke-width="0.9"/>
+    <text x="0" y="28" fill="#f8fafc" font-family="-apple-system, sans-serif" font-size="12" font-weight="700" text-anchor="middle">Sandworm Team</text>
+    <text x="0" y="40" fill="#71717a" font-family="monospace" font-size="9" text-anchor="middle">GRU UNIT 74455</text>
   </g>
 
-  <!-- Node 4: Bottom-Right (Lazarus / Ronin Heist) -->
+  <!-- Node 4: Bottom-Right (Axie Ronin Bridge - Cryptographic Vault Shield Icon) -->
   <g transform="translate(720, 220)">
-    <circle cx="0" cy="0" r="14" fill="#0a1610" stroke="#10b981" stroke-width="2"/>
-    <circle cx="0" cy="0" r="16" fill="none" stroke="#10b981" stroke-width="1" class="sat-halo-4"/>
-    <circle cx="0" cy="0" r="5" fill="#10b981"/>
-    <text x="0" y="26" fill="#f8fafc" font-family="-apple-system, sans-serif" font-size="12" font-weight="700" text-anchor="middle">Axie Ronin Bridge</text>
-    <text x="0" y="38" fill="#71717a" font-family="monospace" font-size="9" text-anchor="middle">INFRASTRUCTURE // $620M</text>
+    <circle cx="0" cy="0" r="16" fill="#09140e" stroke="#10b981" stroke-width="2"/>
+    <circle cx="0" cy="0" r="18" fill="none" stroke="#10b981" stroke-width="1" class="sat-halo-4"/>
+    <!-- Vector Cryptographic Shield Icon -->
+    <path d="M 0 -6 L 5 -3.5 L 5 1 C 5 4.5 0 7 0 7 C 0 7 -5 4.5 -5 1 L -5 -3.5 Z" fill="none" stroke="#10b981" stroke-width="1.1"/>
+    <circle cx="0" cy="0.5" r="1.1" fill="#10b981"/>
+    <text x="0" y="28" fill="#f8fafc" font-family="-apple-system, sans-serif" font-size="12" font-weight="700" text-anchor="middle">Axie Ronin Bridge</text>
+    <text x="0" y="40" fill="#71717a" font-family="monospace" font-size="9" text-anchor="middle">INFRASTRUCTURE // $620M</text>
   </g>
 
-  <!-- Central Hub Node: APT29 (Russian SVR) -->
+  <!-- Central Hub Node: APT29 (Russian SVR - Cyber Command Target Icon) -->
   <g transform="translate(450, 150)">
     <!-- Expanding Halo Pulse -->
-    <circle cx="0" cy="0" r="22" fill="#f43f5e" opacity="0.15" class="center-halo" filter="url(#strongGlow)"/>
-    <circle cx="0" cy="0" r="18" fill="#1c0a0e" stroke="#f43f5e" stroke-width="2.5" filter="url(#neon)"/>
-    <circle cx="0" cy="0" r="7" fill="#f43f5e"/>
+    <circle cx="0" cy="0" r="26" fill="#f43f5e" opacity="0.16" class="center-halo" filter="url(#strongGlow)"/>
+    <circle cx="0" cy="0" r="20" fill="#1c090d" stroke="#f43f5e" stroke-width="2.5" filter="url(#neon)"/>
+    <!-- Vector Tactical Crosshair Icon -->
+    <circle cx="0" cy="0" r="7" fill="none" stroke="#f43f5e" stroke-width="1.2"/>
+    <circle cx="0" cy="0" r="2.5" fill="#f43f5e"/>
+    <line x1="0" y1="-11" x2="0" y2="-7" stroke="#f43f5e" stroke-width="1.2"/>
+    <line x1="0" y1="7" x2="0" y2="11" stroke="#f43f5e" stroke-width="1.2"/>
+    <line x1="-11" y1="0" x2="-7" y2="0" stroke="#f43f5e" stroke-width="1.2"/>
+    <line x1="7" y1="0" x2="11" y2="0" stroke="#f43f5e" stroke-width="1.2"/>
     
     <text x="0" y="34" fill="#ffffff" font-family="-apple-system, sans-serif" font-size="14" font-weight="900" text-anchor="middle" letter-spacing="0.5">
       APT29 // SVR
@@ -235,9 +258,9 @@
   <!-- Bottom Timeline Scrubber Axis -->
   <g transform="translate(40, 310)">
     <!-- Base track -->
-    <line x1="20" y1="12" x2="800" y2="12" stroke="#1e2436" stroke-width="2"/>
+    <line x1="20" y1="12" x2="800" y2="12" stroke="#1c2333" stroke-width="2"/>
     
-    <!-- Years Tick Marks -->
+    <!-- Years Tick Marks with Technical Hex Identifiers -->
     <g font-family="monospace" font-size="9" fill="#64748b" text-anchor="middle">
       <circle cx="60" cy="12" r="2.5" fill="#38bdf8"/>
       <text x="60" y="26">2014</text>

@@ -10,6 +10,7 @@ Manages:
 """
 
 import uuid
+import html
 from datetime import datetime, timezone
 from typing import List, Dict, Any, Optional
 from app.db.database import get_connection, row_to_dict, rows_to_dicts
@@ -114,8 +115,12 @@ class DossierEngine:
             notes=notes
         )
 
-    def add_item(self, workspace_id: str, item: WorkspaceItemAdd) -> Dict[str, Any]:
+    def add_item(self, workspace_id: str, item: WorkspaceItemAdd) -> Optional[Dict[str, Any]]:
         conn = self._get_conn()
+        ws_exists = conn.execute("SELECT id FROM workspaces WHERE id = ?", (workspace_id,)).fetchone()
+        if not ws_exists:
+            return None
+
         item_id = f"wi_{uuid.uuid4().hex[:10]}"
         now = utcnow_iso()
         conn.execute(
@@ -130,14 +135,22 @@ class DossierEngine:
         conn.commit()
         return {"status": "ok", "workspace_item_id": item_id}
 
-    def remove_item(self, workspace_id: str, workspace_item_id: str) -> Dict[str, Any]:
+    def remove_item(self, workspace_id: str, workspace_item_id: str) -> Optional[Dict[str, Any]]:
         conn = self._get_conn()
+        ws_exists = conn.execute("SELECT id FROM workspaces WHERE id = ?", (workspace_id,)).fetchone()
+        if not ws_exists:
+            return None
+
         conn.execute("DELETE FROM workspace_items WHERE workspace_id = ? AND (id = ? OR item_id = ?)", (workspace_id, workspace_item_id, workspace_item_id))
         conn.commit()
         return {"status": "ok"}
 
-    def add_note(self, workspace_id: str, note: WorkspaceNoteCreate) -> Dict[str, Any]:
+    def add_note(self, workspace_id: str, note: WorkspaceNoteCreate) -> Optional[Dict[str, Any]]:
         conn = self._get_conn()
+        ws_exists = conn.execute("SELECT id FROM workspaces WHERE id = ?", (workspace_id,)).fetchone()
+        if not ws_exists:
+            return None
+
         note_id = f"wn_{uuid.uuid4().hex[:10]}"
         now = utcnow_iso()
         conn.execute(
@@ -232,18 +245,71 @@ class DossierEngine:
         return "\n".join(lines)
 
     def export_dossier_html(self, workspace_id: str) -> str:
-        """Generate a standalone printable dark intelligence report in HTML."""
+        """Generate a standalone printable dark intelligence report in HTML with strict XSS sanitization."""
         ws = self.get_workspace(workspace_id)
         if not ws:
-            return "<html><body><h1>Workspace Not Found</h1></body></html>"
+            return "<!DOCTYPE html><html><head><meta charset='utf-8'/><title>Not Found</title></head><body><h1>Workspace Not Found</h1></body></html>"
 
-        md_content = self.export_dossier_markdown(workspace_id)
-        # Generate clean HTML presentation
-        html = f"""<!DOCTYPE html>
+        safe_title = html.escape(ws.title, quote=True)
+        safe_analyst = html.escape(ws.analyst_name, quote=True)
+        safe_id = html.escape(ws.id, quote=True)
+        safe_desc = html.escape(ws.description or "No executive summary provided.", quote=True)
+        gen_time = html.escape(utcnow_iso(), quote=True)
+
+        items_html = []
+        for it in ws.items:
+            stance = it.get('hypothesis_stance', 'neutral')
+            badge_class = 'badge-support' if stance == 'supports_hypothesis' else 'badge-refute' if stance == 'refutes_hypothesis' else ''
+            safe_stance = html.escape(str(stance), quote=True)
+            safe_type = html.escape(str(it.get('item_type', '')), quote=True)
+            safe_pinned = html.escape(str(it.get('pinned_at', ''))[:19], quote=True)
+            
+            d = it.get('details', {})
+            label_raw = d.get('canonical_name') or d.get('title') or d.get('claim_text') or it.get('item_id', '')
+            safe_label = html.escape(str(label_raw), quote=True)
+            
+            quote_block = ""
+            if d.get("text"):
+                safe_text = html.escape(str(d["text"]), quote=True)
+                quote_block = f'<div class="quote">{safe_text}</div>'
+                
+            note_block = ""
+            if it.get("analyst_note"):
+                safe_note = html.escape(str(it["analyst_note"]), quote=True)
+                note_block = f'<p style="color:#fbbf24;font-size:13px;"><strong>Analyst Note:</strong> {safe_note}</p>'
+
+            items_html.append(f"""
+            <div class="item-card">
+              <div class="meta">
+                <span class="badge {badge_class}">{safe_stance}</span>
+                TYPE: {safe_type} | PINNED: {safe_pinned}
+              </div>
+              <div><strong>{safe_label}</strong></div>
+              {quote_block}
+              {note_block}
+            </div>
+            """)
+
+        notes_html = []
+        for n in ws.notes:
+            n_title = html.escape(str(n.get('title', '')), quote=True)
+            n_time = html.escape(str(n.get('updated_at', '')), quote=True)
+            n_body = html.escape(str(n.get('content', '')), quote=True).replace("\n", "<br/>")
+            notes_html.append(f"""
+            <div class="item-card">
+              <h3>{n_title}</h3>
+              <div class="meta">Updated: {n_time}</div>
+              <div>{n_body}</div>
+            </div>
+            """)
+
+        # Generate clean HTML presentation with Content-Security-Policy
+        html_out = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<title>HistoryFather Intelligence Dossier - {ws.title}</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; font-src data:; img-src data:; base-uri 'none'; form-action 'none';"/>
+<title>HistoryFather Intelligence Dossier - {safe_title}</title>
 <style>
   body {{
     background-color: #09090b;
@@ -270,35 +336,19 @@ class DossierEngine:
 <body>
   <h1>HISTORYFATHER // INTELLIGENCE DOSSIER</h1>
   <div class="meta">
-    CASE: <strong>{ws.title}</strong> | ID: <code>{ws.id}</code> | ANALYST: {ws.analyst_name} | GENERATED: {utcnow_iso()}
+    CASE: <strong>{safe_title}</strong> | ID: <code>{safe_id}</code> | ANALYST: {safe_analyst} | GENERATED: {gen_time}
   </div>
-  <p>{ws.description or "No executive summary provided."}</p>
+  <p>{safe_desc}</p>
   
   <h2>Evidence & Hypothesis Ledger</h2>
-  {"".join([f'''
-  <div class="item-card">
-    <div class="meta">
-      <span class="badge {'badge-support' if it.get('hypothesis_stance') == 'supports_hypothesis' else 'badge-refute' if it.get('hypothesis_stance') == 'refutes_hypothesis' else ''}">{it.get('hypothesis_stance')}</span>
-      TYPE: {it['item_type']} | PINNED: {it['pinned_at'][:19]}
-    </div>
-    <div><strong>{it.get('details', {}).get('canonical_name') or it.get('details', {}).get('title') or it.get('details', {}).get('claim_text') or it['item_id']}</strong></div>
-    {f'<div class="quote">{it.get("details", {}).get("text")}</div>' if it.get("details", {}).get("text") else ''}
-    {f'<p style="color:#fbbf24;font-size:13px;"><strong>Analyst Note:</strong> {it["analyst_note"]}</p>' if it.get("analyst_note") else ''}
-  </div>
-  ''' for it in ws.items])}
+  {"".join(items_html)}
 
   <h2>Analyst Notes</h2>
-  {"".join([f'''
-  <div class="item-card">
-    <h3>{n['title']}</h3>
-    <div class="meta">Updated: {n['updated_at']}</div>
-    <div>{n['content'].replace(chr(10), '<br/>')}</div>
-  </div>
-  ''' for n in ws.notes])}
+  {"".join(notes_html)}
 
   <hr/>
   <div class="meta" style="text-align: center;">HistoryFather Temporal Intelligence Engine &copy; 2026. All conclusions backed by verifiable evidence.</div>
 </body>
 </html>
 """
-        return html
+        return html_out

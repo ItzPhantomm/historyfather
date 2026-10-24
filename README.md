@@ -9,6 +9,10 @@
   <a href="#6-automated-test-suite"><img src="https://img.shields.io/badge/Verification-25%20Passed-09090b?style=for-the-badge&logo=checkmarx&logoColor=10b981&labelColor=18181b" alt="Verification" /></a>
 </p>
 
+<p align="center">
+  <img src="https://skillicons.dev/icons?i=python,fastapi,sqlite,react,ts,tailwind,vite,docker,git&theme=dark" alt="HistoryFather Tech Stack" />
+</p>
+
 # HistoryFather // Temporal Intelligence Search Engine
 
 > **"Search history as evidence, not just a list of results."**
@@ -31,8 +35,6 @@ Instead of flattening history into a static snapshot, HistoryFather answers thre
 - **Topological Multi-Directed Graph (`NetworkX`)**: Visualizes directed influence, attack vectors (`TARGETS`, `EXPLOITS`, `DEPLOYS`), and attribution ties (`ATTRIBUTED_TO`).
 - **Verbatim Provenance Excerpts**: Every edge is bound to primary source document excerpts with exact timestamp markers ($T_{pub}$, $T_{event}$).
 - **Historical Fog-of-War Scrubber**: Dynamically scrubs historical knowledge states between 2014 and 2026 without retroactive contamination.
-
----
 
 ---
 
