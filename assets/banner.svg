@@ -1,0 +1,187 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 240" width="100%" height="100%">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#08090c"/>
+      <stop offset="50%" stop-color="#0d0e15"/>
+      <stop offset="100%" stop-color="#050608"/>
+    </linearGradient>
+
+    <linearGradient id="cyanGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="50%" stop-color="#818cf8"/>
+      <stop offset="100%" stop-color="#c084fc"/>
+    </linearGradient>
+
+    <linearGradient id="gridFade" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.25"/>
+      <stop offset="70%" stop-color="#38bdf8" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#38bdf8" stop-opacity="0"/>
+    </linearGradient>
+
+    <linearGradient id="radarSweep" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0"/>
+      <stop offset="85%" stop-color="#38bdf8" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.75"/>
+    </linearGradient>
+
+    <!-- Filter Glow -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <filter id="nodeGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <style>
+    @keyframes pulsePacket {
+      0% { stroke-dashoffset: 400; }
+      100% { stroke-dashoffset: 0; }
+    }
+    @keyframes sweepLine {
+      0% { transform: translateX(-900px); }
+      100% { transform: translateX(900px); }
+    }
+    @keyframes breathe {
+      0%, 100% { opacity: 0.35; transform: scale(1); }
+      50% { opacity: 0.85; transform: scale(1.15); }
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.25; }
+    }
+    @keyframes scanline {
+      0% { transform: translateY(-240px); }
+      100% { transform: translateY(240px); }
+    }
+    .grid-line { stroke: #1e2230; stroke-width: 0.75; }
+    .packet-path {
+      stroke-dasharray: 60 340;
+      animation: pulsePacket 4s linear infinite;
+    }
+    .sweep {
+      animation: sweepLine 6s ease-in-out infinite;
+    }
+    .pulse-dot {
+      animation: breathe 3s ease-in-out infinite;
+      transform-origin: center;
+    }
+    .live-indicator {
+      animation: blink 1.6s ease-in-out infinite;
+    }
+    .scan {
+      animation: scanline 8s linear infinite;
+    }
+  </style>
+
+  <!-- Background -->
+  <rect width="900" height="240" fill="url(#bgGrad)" rx="12"/>
+  <rect width="900" height="240" fill="none" stroke="#1f2433" stroke-width="1.5" rx="12"/>
+
+  <!-- Grid System -->
+  <g opacity="0.6">
+    <!-- Verticals -->
+    <line x1="100" y1="0" x2="100" y2="240" class="grid-line" />
+    <line x1="200" y1="0" x2="200" y2="240" class="grid-line" />
+    <line x1="300" y1="0" x2="300" y2="240" class="grid-line" />
+    <line x1="400" y1="0" x2="400" y2="240" class="grid-line" />
+    <line x1="500" y1="0" x2="500" y2="240" class="grid-line" />
+    <line x1="600" y1="0" x2="600" y2="240" class="grid-line" />
+    <line x1="700" y1="0" x2="700" y2="240" class="grid-line" />
+    <line x1="800" y1="0" x2="800" y2="240" class="grid-line" />
+    <!-- Horizontals -->
+    <line x1="0" y1="48" x2="900" y2="48" class="grid-line" />
+    <line x1="0" y1="96" x2="900" y2="96" class="grid-line" />
+    <line x1="0" y1="144" x2="900" y2="144" class="grid-line" />
+    <line x1="0" y1="192" x2="900" y2="192" class="grid-line" />
+  </g>
+
+  <!-- Circuit Trace Lines with Animated Light Packets -->
+  <path d="M 40 20 L 180 20 L 220 60 L 680 60 L 720 20 L 860 20" fill="none" stroke="#1c253b" stroke-width="2"/>
+  <path d="M 40 20 L 180 20 L 220 60 L 680 60 L 720 20 L 860 20" fill="none" stroke="#38bdf8" stroke-width="2.5" class="packet-path" filter="url(#glow)"/>
+
+  <path d="M 40 220 L 260 220 L 300 180 L 600 180 L 640 220 L 860 220" fill="none" stroke="#1c253b" stroke-width="2"/>
+  <path d="M 40 220 L 260 220 L 300 180 L 600 180 L 640 220 L 860 220" fill="none" stroke="#c084fc" stroke-width="2.5" class="packet-path" style="animation-duration: 5s; animation-direction: reverse;" filter="url(#glow)"/>
+
+  <!-- Radar Sweep Horizon -->
+  <rect x="0" y="0" width="120" height="240" fill="url(#radarSweep)" class="sweep" pointer-events="none"/>
+
+  <!-- Corner Tactical Crosshairs -->
+  <g stroke="#38bdf8" stroke-width="1.2" opacity="0.6">
+    <path d="M 16 28 L 16 16 L 28 16" fill="none"/>
+    <path d="M 884 28 L 884 16 L 872 16" fill="none"/>
+    <path d="M 16 212 L 16 224 L 28 224" fill="none"/>
+    <path d="M 884 212 L 884 224 L 872 224" fill="none"/>
+  </g>
+
+  <!-- Header Metadata Pill -->
+  <g transform="translate(48, 44)">
+    <rect width="180" height="24" rx="4" fill="#121622" stroke="#252d42" stroke-width="1"/>
+    <circle cx="14" cy="12" r="3.5" fill="#10b981" class="live-indicator"/>
+    <text x="26" y="16" fill="#a1a1aa" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', monospace" font-size="10.5" font-weight="600" letter-spacing="1">
+      SYS_CORE // ONLINE
+    </text>
+    <text x="146" y="16" fill="#38bdf8" font-family="monospace" font-size="10" font-weight="700">
+      v1.4
+    </text>
+  </g>
+
+  <!-- Right Pill: Target Coordinate -->
+  <g transform="translate(680, 44)">
+    <rect width="170" height="24" rx="4" fill="#121622" stroke="#252d42" stroke-width="1"/>
+    <text x="14" y="16" fill="#71717a" font-family="monospace" font-size="10.5" letter-spacing="0.5">
+      EPOCH: <tspan fill="#34d399">2026.HIST</tspan>
+    </text>
+    <circle cx="152" cy="12" r="3.5" fill="#38bdf8" class="pulse-dot"/>
+  </g>
+
+  <!-- Center Typography -->
+  <g transform="translate(48, 122)">
+    <text x="0" y="0" font-family="-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif" font-size="44" font-weight="900" letter-spacing="3" fill="#ffffff" filter="url(#glow)">
+      PHANTOM
+    </text>
+    <text x="260" y="-8" font-family="monospace" font-size="13" font-weight="700" fill="#38bdf8" letter-spacing="2">
+      // 0x7068
+    </text>
+    <text x="0" y="28" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', monospace" font-size="13" font-weight="600" fill="#94a3b8" letter-spacing="2">
+      SYSTEMS ENGINEER &bull; APPLIED INTELLIGENCE ARCHITECT
+    </text>
+  </g>
+
+  <!-- Bottom Metric Trackers -->
+  <g transform="translate(48, 196)">
+    <!-- Metric 1 -->
+    <g transform="translate(0, 0)">
+      <circle cx="6" cy="6" r="3" fill="#38bdf8"/>
+      <text x="16" y="9" font-family="monospace" font-size="11" fill="#cbd5e1" font-weight="500">
+        TEMPORAL_GRAPH: <tspan fill="#38bdf8" font-weight="700">DETERMINISTIC</tspan>
+      </text>
+    </g>
+
+    <!-- Metric 2 -->
+    <g transform="translate(260, 0)">
+      <circle cx="6" cy="6" r="3" fill="#10b981"/>
+      <text x="16" y="9" font-family="monospace" font-size="11" fill="#cbd5e1" font-weight="500">
+        EVIDENCE_PROVENANCE: <tspan fill="#10b981" font-weight="700">100% VERIFIED</tspan>
+      </text>
+    </g>
+
+    <!-- Metric 3 -->
+    <g transform="translate(560, 0)">
+      <circle cx="6" cy="6" r="3" fill="#c084fc"/>
+      <text x="16" y="9" font-family="monospace" font-size="11" fill="#cbd5e1" font-weight="500">
+        CIRCULARITY_FILTER: <tspan fill="#c084fc" font-weight="700">ACTIVE</tspan>
+      </text>
+    </g>
+  </g>
+</svg>

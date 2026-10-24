@@ -1,3 +1,14 @@
+<p align="center">
+  <img src="assets/banner.svg" alt="HistoryFather // High-Assurance Temporal Intelligence" width="100%" />
+</p>
+
+<p align="center">
+  <a href="#core-architecture"><img src="https://img.shields.io/badge/Engine-Temporal_Intelligence-09090b?style=for-the-badge&logo=databricks&logoColor=38bdf8&labelColor=18181b" alt="Engine" /></a>
+  <a href="#strict-four-timestamp-model"><img src="https://img.shields.io/badge/Temporal_Coordinates-4--Timestamp_Model-09090b?style=for-the-badge&logo=speedtest&logoColor=34d399&labelColor=18181b" alt="Temporal Coordinates" /></a>
+  <a href="#interactive-temporal-relationship-graph"><img src="https://img.shields.io/badge/Graph-NetworkX_Topological-09090b?style=for-the-badge&logo=diagramsdotnet&logoColor=f43f5e&labelColor=18181b" alt="Graph Engine" /></a>
+  <a href="#6-automated-test-suite"><img src="https://img.shields.io/badge/Verification-25%20Passed-09090b?style=for-the-badge&logo=checkmarx&logoColor=10b981&labelColor=18181b" alt="Verification" /></a>
+</p>
+
 # HistoryFather // Temporal Intelligence Search Engine
 
 > **"Search history as evidence, not just a list of results."**
@@ -8,6 +19,20 @@ Instead of flattening history into a static snapshot, HistoryFather answers thre
 1. **What was known then?** (Point-in-time state & historical fog-of-war)
 2. **What changed?** (Temporal diffing: newly observed entities, altered ties, refuted claims)
 3. **What supports that conclusion?** (Every edge and claim backed by traceable verbatim passages, timestamps, and deduplicated provenance)
+
+---
+
+### Interactive Temporal Relationship Graph
+
+<p align="center">
+  <img src="assets/temporal-graph.svg" alt="HistoryFather Interactive Temporal Relationship Graph &amp; Timeline Scrubber" width="100%" />
+</p>
+
+- **Topological Multi-Directed Graph (`NetworkX`)**: Visualizes directed influence, attack vectors (`TARGETS`, `EXPLOITS`, `DEPLOYS`), and attribution ties (`ATTRIBUTED_TO`).
+- **Verbatim Provenance Excerpts**: Every edge is bound to primary source document excerpts with exact timestamp markers ($T_{pub}$, $T_{event}$).
+- **Historical Fog-of-War Scrubber**: Dynamically scrubs historical knowledge states between 2014 and 2026 without retroactive contamination.
+
+---
 
 ---
 
